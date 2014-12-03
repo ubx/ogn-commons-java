@@ -35,6 +35,8 @@ public class AprsReceiverBeaconTest {
 
         assertNotNull(b1);
 
+        assertEquals(recBeacon,b1.getRawPacket());
+        
         assertEquals("EBZW", b1.getId());
 
         assertEquals(51.0143333f, b1.getLat(), 0.0001);
@@ -67,6 +69,8 @@ public class AprsReceiverBeaconTest {
         String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
         ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
+        
+        assertEquals(recBeacon,b1.getRawPacket());
 
         // still, the object should be created (although its attributes will not be initialized)
         assertNotNull(b1);

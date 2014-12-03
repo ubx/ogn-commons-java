@@ -41,6 +41,8 @@ public class AprsAircraftBeaconTest {
 
         assertNotNull(b1);
 
+        assertEquals(acBeacon,b1.getRawPacket());
+        
         assertEquals("PH-844", b1.getId());
         
         assertEquals(0,AprsUtils.toUtcTimestamp(10, 25, 29)-b1.getTimestamp());
@@ -77,6 +79,8 @@ public class AprsAircraftBeaconTest {
         String acBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
         AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+        
+        assertEquals(acBeacon,b1.getRawPacket());
 
         // still, the object should be created (although its attributes won't be initialized)
         assertNotNull(b1);

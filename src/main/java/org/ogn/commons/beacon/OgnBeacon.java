@@ -35,4 +35,10 @@ public interface OgnBeacon {
      * @return beacon's altitude (m)
      */
     float getAlt();
+    
+    /**
+     * 
+     * @return raw (un-decoded) string representation of a packet
+     */
+    String getRawPacket();
 }

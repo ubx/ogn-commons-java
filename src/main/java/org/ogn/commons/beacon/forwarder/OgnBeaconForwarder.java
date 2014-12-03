@@ -13,9 +13,26 @@ import org.ogn.commons.beacon.OgnBeacon;
  * @author wbuczak
  */
 public interface OgnBeaconForwarder {
+
+    /**
+     * @return short plugin's name
+     */
     String getName();
 
+    /**
+     * @return version in format X.Y.Z (e.g. 1.0.0)
+     */
     String getVersion();
 
+    /**
+     * @return plgin's description (where does it send data to, etc..)
+     */
+    String getDescription();
+
+    /**
+     * plugin should implement this interface to deliver beacon to destination system
+     * 
+     * @param beacon OGN beacon
+     */
     <BeaconType extends OgnBeacon> void onBeacon(BeaconType beacon);
 }

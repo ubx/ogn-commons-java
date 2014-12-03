@@ -22,11 +22,13 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
     protected double lat;
     protected double lon;
     protected float alt;
+    protected String rawPacket;
 
     protected OgnBeaconImpl() {
     }
 
-    public OgnBeaconImpl(String id, long timestamp, double latitude, double longitude, float altitude) {
+    public OgnBeaconImpl(String rawPacket, String id, long timestamp, double latitude, double longitude, float altitude) {
+        this.rawPacket = rawPacket;
         this.id = id;
         this.timestamp = timestamp;
         this.lat = latitude;
@@ -57,6 +59,11 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
     @Override
     public float getAlt() {
         return alt;
+    }
+
+    @Override
+    public String getRawPacket() {
+        return rawPacket;
     }
 
     @Override

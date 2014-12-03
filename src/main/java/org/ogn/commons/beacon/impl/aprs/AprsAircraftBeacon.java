@@ -201,6 +201,9 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
         Matcher matcher;
 
         List<String> unmachedParams = new ArrayList<>();
+        
+        // remember raw packet string
+        rawPacket = aprsSentence;
 
         String[] aprsParams = aprsSentence.split("\\s+");
         for (String aprsParam : aprsParams) {

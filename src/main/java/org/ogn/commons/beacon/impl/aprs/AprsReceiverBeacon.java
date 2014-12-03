@@ -152,6 +152,10 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 
         List<String> unmachedParams = new ArrayList<>();
         Matcher matcher = null;
+        
+        // remember raw packet string
+        rawPacket = aprsSentence;
+        
         String[] aprsParams = aprsSentence.split("\\s+");
         for (String aprsParam : aprsParams) {
 
