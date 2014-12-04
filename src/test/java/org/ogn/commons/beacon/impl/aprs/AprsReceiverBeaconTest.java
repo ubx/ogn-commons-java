@@ -7,6 +7,7 @@ package org.ogn.commons.beacon.impl.aprs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.ogn.commons.beacon.ReceiverBeacon;
@@ -30,7 +31,7 @@ public class AprsReceiverBeaconTest {
     
     @Test
     public void test1() {
-        String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
+        String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
         ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
 
         assertNotNull(b1);
@@ -38,6 +39,10 @@ public class AprsReceiverBeaconTest {
         assertEquals(recBeacon,b1.getRawPacket());
         
         assertEquals("EBZW", b1.getId());
+        assertEquals("1.0.4",b1.getVersion());
+        assertEquals(100004,b1.getNumericVersion());
+        
+        assertEquals("GLIDERN1",b1.getServerName());
 
         assertEquals(51.0143333f, b1.getLat(), 0.0001);
         assertEquals(5.52383333f, b1.getLon(), 0.0001);
@@ -61,6 +66,8 @@ public class AprsReceiverBeaconTest {
         recBeacon = "HHWaard>APRS,TCPIP*,qAC,GLIDERN2:/102540h5240.05NI00450.69E&/A=000020 CPU:1.1 RAM:223.5/458.7MB NTP:0.3ms/-14.8ppm +40.6C RF:+49+4.1ppm/+0.2dB";
         b1 = new AprsReceiverBeacon(recBeacon);
         assertEquals(40.6, b1.getCpuTemp(), 0.01);
+        assertNull(b1.getVersion());
+        assertEquals(0,b1.getNumericVersion());
 
     }
 

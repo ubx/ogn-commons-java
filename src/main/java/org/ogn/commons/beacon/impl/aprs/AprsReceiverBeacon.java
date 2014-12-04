@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
+import org.ogn.commons.utils.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +27,14 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
     private static final Logger LOG = LoggerFactory.getLogger(AprsReceiverBeacon.class);
 
     /**
-     * 
+     * name of the server receiving the packet
      */
     protected String srvName;
+
+    /**
+     * receiver's version
+     */
+    protected String version;
 
     /**
      * CPU load (as indicated by the linux 'uptime' command)
@@ -84,6 +90,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
     private static final Pattern basicAprsPattern = Pattern
             .compile("(.+)>.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W)./A=(\\d{6}).*");
 
+    private static final Pattern versionPattern = Pattern.compile("v(\\d+\\.\\d+\\.\\d+)");
     private static final Pattern cpuPattern = Pattern.compile("CPU:(\\d+\\.\\d+)");
     private static final Pattern cpuTempPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)C");
     private static final Pattern ramPattern = Pattern.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
@@ -141,6 +148,21 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
         return recInputNoise;
     }
 
+    @Override
+    public String getServerName() {
+        return srvName;
+    }
+
+    @Override
+    public String getVersion() {
+        return version;
+    }
+
+    @Override
+    public int getNumericVersion() {
+        return version == null ? 0 : Version.fromString(version);
+    }
+
     // private default constructor
     // required by jackson (as it uses reflection)
     @SuppressWarnings("unused")
@@ -152,10 +174,10 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 
         List<String> unmachedParams = new ArrayList<>();
         Matcher matcher = null;
-        
+
         // remember raw packet string
         rawPacket = aprsSentence;
-        
+
         String[] aprsParams = aprsSentence.split("\\s+");
         for (String aprsParam : aprsParams) {
 
@@ -173,8 +195,9 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 
                 alt = feetsToMetres(Float.parseFloat(matcher.group(8)));
             }
-
-            else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
+            else if ((matcher = versionPattern.matcher(aprsParam)).matches()) {
+                version = matcher.group(1);
+            }else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
                 cpuLoad = Float.parseFloat(matcher.group(1));
             } else if ((matcher = cpuTempPattern.matcher(aprsParam)).matches()) {
                 cpuTemp = Float.parseFloat(matcher.group(2));
@@ -259,4 +282,5 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
             return false;
         return true;
     }
+
 }

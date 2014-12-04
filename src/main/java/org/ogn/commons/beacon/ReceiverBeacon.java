@@ -16,7 +16,6 @@ public interface ReceiverBeacon extends OgnBeacon {
      */
     float getCpuTemp();
 
-
     /**
      * @return size of free RAM (in MB)
      */
@@ -27,7 +26,6 @@ public interface ReceiverBeacon extends OgnBeacon {
      */
     float getTotalRam();
 
-    
     /**
      * @return estimated NTP error (in ms)
      */
@@ -58,4 +56,20 @@ public interface ReceiverBeacon extends OgnBeacon {
      * @return receiver's input noise (in dB)
      */
     float getRecInputNoise();
+
+    /**
+     * @return name of the server receiving the packet
+     */
+    String getServerName();
+
+    /**
+     * @return receiver version (if available) or null
+     */
+    String getVersion();
+
+    /**
+     * @return numeric representation of the receiver's version or 0 (if version is not available)
+     */
+    int getNumericVersion();
+
 }
