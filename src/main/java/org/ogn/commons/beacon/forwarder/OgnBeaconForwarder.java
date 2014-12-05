@@ -4,7 +4,6 @@
 
 package org.ogn.commons.beacon.forwarder;
 
-import org.ogn.commons.beacon.OgnBeacon;
 
 /**
  * This interface is to be implemented by all OGN gateway packet forwarder plugins. Packet Forwarders are services
@@ -25,14 +24,8 @@ public interface OgnBeaconForwarder {
     String getVersion();
 
     /**
-     * @return plgin's description (where does it send data to, etc..)
+     * @return plugin's description (where does it send data to, etc..)
      */
     String getDescription();
-
-    /**
-     * plugin should implement this interface to deliver beacon to destination system
-     * 
-     * @param beacon OGN beacon
-     */
-    <BeaconType extends OgnBeacon> void onBeacon(BeaconType beacon);
+   
 }
