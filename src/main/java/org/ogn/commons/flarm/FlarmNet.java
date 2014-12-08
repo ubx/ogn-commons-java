@@ -3,18 +3,24 @@ package org.ogn.commons.flarm;
 import static org.ogn.commons.utils.StringUtils.hex2ascii;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.beacon.impl.AircraftDescriptorImpl;
+import org.ogn.commons.utils.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles FlarmNet db file. This class is thread-safe!
+ * This class handles FlarmNet db. Flarmnet db is loaded from remote service and kept in a cache. This class is
+ * thread-safe!
  * 
  * @author Seb, wbuczak
  */
@@ -24,25 +30,36 @@ public class FlarmNet {
 
     private static Logger LOG = LoggerFactory.getLogger(FlarmNet.class);
 
-    private static final String DEFAULT_FLARMNET_FILE = "bin/data.fln";
+    private static final String DEFAULT_FLARMNET_FILE_URL = "http://flarmnet.org/files/data.fln";
 
     private ConcurrentMap<String, AircraftDescriptor> flarmNetCache = new ConcurrentHashMap<>();
 
-    private String dbFilePath;
+    private String flarmnetFileUrl;
 
     public FlarmNet() {
-        this(DEFAULT_FLARMNET_FILE);
+        this(DEFAULT_FLARMNET_FILE_URL);
     }
 
-    public FlarmNet(String dbFile) {
-        this.dbFilePath = dbFile;
+    public FlarmNet(String flarmnetFileUrl) {
+        if (flarmnetFileUrl == null) {
+            this.flarmnetFileUrl = DEFAULT_FLARMNET_FILE_URL;
+        } else {
+            this.flarmnetFileUrl = flarmnetFileUrl;
+        }
     }
 
     public synchronized void reload() {
-        File dbFile = new File(dbFilePath);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(dbFile));
+
+            URL url = new URL(flarmnetFileUrl);
+      
+            Streams.copy(url.openStream(), bos);
+
+            br = new BufferedReader(new StringReader(bos.toString()));
             String line;
             while ((line = br.readLine()) != null) {
                 String decodedLine = new String(hex2ascii(line));
@@ -81,5 +98,4 @@ public class FlarmNet {
     public AircraftDescriptor getDescriptor(String id) {
         return flarmNetCache.get(id);
     }
-
 }

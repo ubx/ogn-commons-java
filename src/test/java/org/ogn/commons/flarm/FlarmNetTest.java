@@ -19,7 +19,7 @@ public class FlarmNetTest {
     @Test
     public void test() throws Exception {
 
-        final FlarmNet fnet = new FlarmNet("src/test/resources/data.fln");
+        final FlarmNet fnet = new FlarmNet();
         fnet.reload();
         AircraftDescriptor desc = fnet.getDescriptor("DF08E8"); // FLARM address
         assertNotNull(desc);
@@ -34,7 +34,7 @@ public class FlarmNetTest {
 
             @Override
             public void run() {
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < 2; i++) {
                     // reload once more
                     fnet.reload();
                 }
@@ -51,7 +51,7 @@ public class FlarmNetTest {
 
         Random r = new Random(System.currentTimeMillis());
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
 
             desc = fnet.getDescriptor("406042"); // ICAO address
             System.out.println(JsonUtils.toJson(desc));
