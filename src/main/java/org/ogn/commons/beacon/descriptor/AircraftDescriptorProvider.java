@@ -4,7 +4,6 @@
 
 package org.ogn.commons.beacon.descriptor;
 
-import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 
 /**
@@ -16,8 +15,8 @@ import org.ogn.commons.beacon.AircraftDescriptor;
 public interface AircraftDescriptorProvider {
 
     /**
-     * @param beacon aircraft beacon
+     * @param address hardware address (FLARM.ICAO,OGN..)
      * @return static aircraft's descriptor or null if unavailable
      */
-    AircraftDescriptor getDescritor(AircraftBeacon beacon);
+    AircraftDescriptor getDescritor(String address);
 }

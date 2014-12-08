@@ -43,8 +43,8 @@ public class FlarmNetDescriptorProvider implements AircraftDescriptorProvider {
     }
 
     @Override
-    public AircraftDescriptor getDescritor(AircraftBeacon beacon) {
-        return fn.getDescriptor(beacon.getId());
+    public AircraftDescriptor getDescritor(String address) {
+        return fn.getDescriptor(address);
     }
 
 }

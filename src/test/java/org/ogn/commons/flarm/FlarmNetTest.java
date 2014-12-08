@@ -7,6 +7,7 @@ package org.ogn.commons.flarm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
@@ -77,7 +78,7 @@ public class FlarmNetTest {
             assertEquals("EED", desc.getCN());
             assertEquals("Bicester Gliding", desc.getOwner());
             assertEquals("Ka-8", desc.getModel());
-            assertEquals("129.975", desc.getFreq());
+            assertEquals("129.975", desc.getFreq());                                               
 
             desc = fnet.getDescriptor("some-not-existing");
             assertNull(desc);
@@ -88,5 +89,30 @@ public class FlarmNetTest {
         t1.join();
         t2.join();
     }
-
+    
+    @Test
+    public void test2() {
+        final FlarmNet fnet = new FlarmNet();
+        long t1 = System.currentTimeMillis();
+        fnet.reload();
+        AircraftDescriptor desc = fnet.getDescriptor("3ECE59"); // FLARM address
+        assertNotNull(desc);
+        System.out.println(JsonUtils.toJson(desc));        
+        assertTrue(desc.isKnown());
+        assertEquals("D-KTCJ",desc.getRegNumber());
+        long t2 = System.currentTimeMillis();
+        long dt = t2 - t1;
+              
+        desc = fnet.getDescriptor("3ECE59"); // FLARM address
+        desc = fnet.getDescriptor("3ECE59");
+        desc = fnet.getDescriptor("3ECE59");
+        desc = fnet.getDescriptor("3ECE59");
+        assertNotNull(desc);
+        System.out.println(JsonUtils.toJson(desc));        
+        assertTrue(desc.isKnown());
+        assertEquals("D-KTCJ",desc.getRegNumber());
+        long t3 = System.currentTimeMillis();
+        long dt2 = t3 - t2;
+        assertTrue (dt2 < dt);
+    }
 }
