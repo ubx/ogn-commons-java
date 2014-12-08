@@ -12,6 +12,11 @@ package org.ogn.commons.beacon;
 public interface AircraftDescriptor {
 
     /**
+     * @return true if an aircraft has been recognized by at least one descriptor provider, false otherwise
+     */
+    boolean isKnown();
+
+    /**
      * @return aircraft's registration number
      */
     String getRegNumber();

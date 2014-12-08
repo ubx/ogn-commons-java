@@ -7,6 +7,7 @@ package org.ogn.commons.beacon.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.ogn.commons.beacon.AircraftDescriptor;
@@ -19,6 +20,8 @@ public class AircraftDescriptorImplTest {
         AircraftDescriptor d1 = new AircraftDescriptorImpl("G-EEBM", "EBM", "YGC", "SUTTON BANK", "Grob Astir CS",
                 "129.975");
         assertNotNull(d1);
+        
+        assertTrue(d1.isKnown());
 
         assertEquals("G-EEBM", d1.getRegNumber());
         assertEquals("EBM", d1.getCN());
