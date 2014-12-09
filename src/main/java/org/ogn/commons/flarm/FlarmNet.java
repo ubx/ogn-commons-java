@@ -18,8 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles FlarmNet db. Flarmnet db can be loaded from remote service (via http) or local file and it is kept
- * in a cache. Every time refresh() is called the cache will be updated. This class is thread-safe!
+ * This class handles FlarmNet db. Flarmnet data can be loaded from remote server (e.g. directly from flarmnet) or from
+ * a local flarmnet db. file and it is kept in the internal cache. Every time refresh() is called the cache will be
+ * updated. This class is thread-safe!
  * 
  * @author Seb, wbuczak
  */
