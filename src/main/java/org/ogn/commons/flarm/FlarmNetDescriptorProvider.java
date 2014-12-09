@@ -8,16 +8,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.beacon.descriptor.AircraftDescriptorProvider;
 
+/**
+ * This AircraftDescriptorProvider resolves AircraftDescriptors from FlarmNet
+ * It can be configured to refresh its internal cache periodically.
+ * 
+ * @author wbuczak
+ */
 public class FlarmNetDescriptorProvider implements AircraftDescriptorProvider {
 
     private FlarmNet fn;
     private ScheduledExecutorService scheduledExecutor;
 
-    // in sek
+    // default refresh rate (in sec.)
     private static final int DEFAULT_DB_INTERVAL = 60 * 60;
 
     public FlarmNetDescriptorProvider(String flarmnetFileUrl, int dbRefreshInterval) {
