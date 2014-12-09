@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles FlarmNet db. Flarmnet db is loaded from remote service and kept in a cache. This class is
- * thread-safe!
+ * This class handles FlarmNet db. Flarmnet db can be loaded from remote service (via http) or local file and it is kept
+ * in a cache. Every time refresh() is called the cache will be updated. This class is thread-safe!
  * 
  * @author Seb, wbuczak
  */
@@ -54,24 +54,24 @@ public class FlarmNet {
         BufferedReader br = null;
         try {
             URL url = null;
-          
+
             try {
-              url = new URL(flarmnetFileUri);
-            
-              if (url.getProtocol().equals("file")) {
-                  String path = url.getPath().substring(1); // get rid of leading slash
-                  br = new BufferedReader(new FileReader(path));
-              } else {
-                  Streams.copy(url.openStream(), bos);
-                  br = new BufferedReader(new StringReader(bos.toString()));
-              }              
+                url = new URL(flarmnetFileUri);
+
+                if (url.getProtocol().equals("file")) {
+                    String path = url.getPath().substring(1); // get rid of leading slash
+                    br = new BufferedReader(new FileReader(path));
+                } else {
+                    Streams.copy(url.openStream(), bos);
+                    br = new BufferedReader(new StringReader(bos.toString()));
+                }
             }
-            
-            catch (MalformedURLException ex) {                
-              // for malformed urls - still try to open it as a regular file
+
+            catch (MalformedURLException ex) {
+                // for malformed urls - still try to open it as a regular file
                 br = new BufferedReader(new FileReader(flarmnetFileUri));
             }
-            
+
             String line;
             while ((line = br.readLine()) != null) {
                 String decodedLine = new String(hex2ascii(line));
