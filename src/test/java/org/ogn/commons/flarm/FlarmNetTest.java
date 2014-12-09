@@ -18,7 +18,7 @@ import org.ogn.commons.utils.JsonUtils;
 public class FlarmNetTest {
 
     @Test
-    public void test() throws Exception {
+    public void testWithRemoteFlarmnetDb() throws Exception {
 
         final FlarmNet fnet = new FlarmNet();
         fnet.reload();
@@ -35,7 +35,7 @@ public class FlarmNetTest {
 
             @Override
             public void run() {
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 3; i++) {
                     // reload once more
                     fnet.reload();
                 }
@@ -91,8 +91,8 @@ public class FlarmNetTest {
     }
     
     @Test
-    public void test2() {
-        final FlarmNet fnet = new FlarmNet();
+    public void testCaching() {
+        FlarmNet fnet = new FlarmNet();
         long t1 = System.currentTimeMillis();
         fnet.reload();
         AircraftDescriptor desc = fnet.getDescriptor("3ECE59"); // FLARM address
@@ -114,5 +114,25 @@ public class FlarmNetTest {
         long t3 = System.currentTimeMillis();
         long dt2 = t3 - t2;
         assertTrue (dt2 < dt);
+    }
+    
+    
+    @Test
+    public void testWithLocalFlarmnetDb() throws Exception {
+        FlarmNet fnet = new FlarmNet("src/test/resources/data.fln");
+        fnet.reload();
+        AircraftDescriptor desc = fnet.getDescriptor("DF08E8"); // FLARM address
+        assertNotNull(desc);
+
+        System.out.println(JsonUtils.toJson(desc));
+
+        desc = fnet.getDescriptor("DDD587"); // FLARM address
+        System.out.println(JsonUtils.toJson(desc));
+        assertNotNull(desc);
+        
+        fnet = new FlarmNet("file:///src/test/resources/data.fln");
+        fnet.reload();
+        desc = fnet.getDescriptor("DF08E8"); // FLARM address
+        assertNotNull(desc);
     }
 }

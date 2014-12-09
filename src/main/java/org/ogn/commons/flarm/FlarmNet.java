@@ -4,10 +4,9 @@ import static org.ogn.commons.utils.StringUtils.hex2ascii;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.FileReader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -34,17 +33,17 @@ public class FlarmNet {
 
     private ConcurrentMap<String, AircraftDescriptor> flarmNetCache = new ConcurrentHashMap<>();
 
-    private String flarmnetFileUrl;
+    private String flarmnetFileUri;
 
     public FlarmNet() {
         this(DEFAULT_FLARMNET_FILE_URL);
     }
 
-    public FlarmNet(String flarmnetFileUrl) {
-        if (flarmnetFileUrl == null) {
-            this.flarmnetFileUrl = DEFAULT_FLARMNET_FILE_URL;
+    public FlarmNet(String flarmnetFileUri) {
+        if (flarmnetFileUri == null) {
+            this.flarmnetFileUri = DEFAULT_FLARMNET_FILE_URL;
         } else {
-            this.flarmnetFileUrl = flarmnetFileUrl;
+            this.flarmnetFileUri = flarmnetFileUri;
         }
     }
 
@@ -54,12 +53,25 @@ public class FlarmNet {
 
         BufferedReader br = null;
         try {
-
-            URL url = new URL(flarmnetFileUrl);
-      
-            Streams.copy(url.openStream(), bos);
-
-            br = new BufferedReader(new StringReader(bos.toString()));
+            URL url = null;
+          
+            try {
+              url = new URL(flarmnetFileUri);
+            
+              if (url.getProtocol().equals("file")) {
+                  String path = url.getPath().substring(1); // get rid of leading slash
+                  br = new BufferedReader(new FileReader(path));
+              } else {
+                  Streams.copy(url.openStream(), bos);
+                  br = new BufferedReader(new StringReader(bos.toString()));
+              }              
+            }
+            
+            catch (MalformedURLException ex) {                
+              // for malformed urls - still try to open it as a regular file
+                br = new BufferedReader(new FileReader(flarmnetFileUri));
+            }
+            
             String line;
             while ((line = br.readLine()) != null) {
                 String decodedLine = new String(hex2ascii(line));
