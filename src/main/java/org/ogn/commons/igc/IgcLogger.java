@@ -10,12 +10,28 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ogn.commons.utils.AprsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The IGC logger creates and writes to IGC files. The logger's log() operation is non-blocking (logs are written to a
+ * file by a background thread)
+ * 
+ * @author Seb, wbuczak
+ */
 public class IgcLogger {
+
+    public static enum Mode {
+        ASYNC,
+        SYNC
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(IgcLogger.class);
 
@@ -25,12 +41,66 @@ public class IgcLogger {
 
     private static final String LINE_SEP = System.lineSeparator();
 
-    public IgcLogger(final String logsFolder) {
+    private Mode workingMode;
+
+    private BlockingQueue<LogRecord> logRecords;
+    private volatile Future<?> pollerFuture;
+    private ExecutorService executor;
+
+    private static class LogRecord {
+        String immat;
+        double lat;
+        double lon;
+        float alt;
+        String comment;
+
+        LogRecord(String immat, double lat, double lon, float alt, String comment) {
+            this.immat = immat;
+            this.lat = lat;
+            this.lon = lon;
+            this.alt = alt;
+            this.comment = comment;
+        }
+    }
+
+    private class PollerTask implements Runnable {
+        private Logger PLOG = LoggerFactory.getLogger(PollerTask.class);
+
+        @Override
+        public void run() {
+            PLOG.trace("starting...");
+            LogRecord record = null;
+            while (!Thread.interrupted()) {
+                try {
+                    record = logRecords.take();
+                    logToIgcFile(record.immat, record.lat, record.lon, record.alt, record.comment);
+                } catch (InterruptedException e) {
+                    PLOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
+                    Thread.currentThread().interrupt();
+                    continue;
+                }
+            }// while
+            PLOG.trace("exiting..");
+        }
+    }
+
+    public IgcLogger(Mode mode) {
+        this(DEFAULT_IGC_BASE_DIR, mode);
+    }
+
+    public IgcLogger(final String logsFolder, Mode mode) {
         igcBaseDir = logsFolder;
+        workingMode = mode;
+
+        if (workingMode == Mode.ASYNC) {
+            logRecords = new LinkedBlockingQueue<>();
+            executor = Executors.newSingleThreadExecutor();
+            pollerFuture = executor.submit(new PollerTask());
+        }
     }
 
     public IgcLogger() {
-        this(DEFAULT_IGC_BASE_DIR);
+        this(DEFAULT_IGC_BASE_DIR, Mode.ASYNC);
     }
 
     private void writeIgcHeader(FileWriter igcFile, Calendar calendar, String immat) {
@@ -47,20 +117,7 @@ public class IgcLogger {
         }
     }
 
-    public void log(String immat, double lat, double lon, float alt) {
-        log(immat, lat, lon, alt, null);
-    }
-
-    /**
-     * @param immat aircraft registration (if known) or unique tracker/flarm id
-     * @param lat latitude
-     * @param lon longitude
-     * @param alt altitude
-     * @param comment a string which will fall into the igc file as a comment (e.g. aprs sentence can be logged for
-     *            debugging purposes)
-     */
-    public void log(String immat, double lat, double lon, float alt, String comment) {
-
+    private void logToIgcFile(String immat, double lat, double lon, float alt, String comment) {
         Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(System.currentTimeMillis());
 
@@ -112,10 +169,10 @@ public class IgcLogger {
         // Add fix
         try {
             char latitudeWay = 'N';
-            if (lat < 0)
+            if (lat < 0.0f)
                 latitudeWay = 'S';
             char longitudeWay = 'E';
-            if (lon < 0)
+            if (lon < 0.0f)
                 longitudeWay = 'W';
 
             if (comment != null) {
@@ -151,34 +208,33 @@ public class IgcLogger {
         }
     }
 
-    public void logAprsSentense(String aprsSentence) {
-        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-        calendar.setTimeInMillis(System.currentTimeMillis());
+    public void log(String immat, double lat, double lon, float alt) {
+        log(immat, lat, lon, alt, null);
+    }
 
-        String dateString = new String(String.format("%04d", calendar.get(Calendar.YEAR)) + "-"
-                + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-"
-                + String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
+    /**
+     * @param immat aircraft registration (if known) or unique tracker/flarm id
+     * @param lat latitude
+     * @param lon longitude
+     * @param alt altitude
+     * @param comment a string which will fall into the igc file as a comment (e.g. aprs sentence can be logged for
+     *            debugging purposes)
+     */
+    public void log(String immat, double lat, double lon, float alt, String comment) {
+        switch (workingMode) {
 
-        // Generate filename from date and immat
-        String logFileName = new String(dateString + "-aprs.log");
+        case ASYNC:
+            if (!logRecords.offer(new LogRecord(immat, lat, lon, alt, comment))) {
+                LOG.warn("could not insert LogRecord to the igc logging queue");
+            }
+            break;
 
-        // if directory doesn't exist create it
-        File theDir = new File(igcBaseDir + File.separatorChar + dateString);
-        if (!theDir.exists()) {
-            theDir.mkdir();
-        }
-
-        // Add line to file
-        try {
-            String filePath = igcBaseDir + File.separatorChar + dateString + File.separatorChar + logFileName;
-            FileWriter igcFile = new FileWriter(filePath, true);
-            igcFile.write(aprsSentence + LINE_SEP);
-            igcFile.close(); // closes the file
-        } catch (IOException e) {
-            e.printStackTrace();
+        default:
+            logToIgcFile(immat, lat, lon, alt, comment);
         }
 
     }
+
 }
 
 /*

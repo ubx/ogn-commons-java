@@ -74,7 +74,19 @@ public class IgcLoggerTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void testSync() throws Exception {
+        IgcLogger logger = new IgcLogger(IgcLogger.Mode.SYNC);
+
+        for (String aprsLine : aprsPhrases) {
+            OgnBeacon beacon = new AprsAircraftBeacon(aprsLine);
+            logger.log(beacon.getId(), beacon.getLat(), beacon.getLon(), beacon.getAlt(), aprsLine);
+        }
+
+        commonVerification();
+    }
+
+    @Test
+    public void testAsync() throws Exception {
         IgcLogger logger = new IgcLogger();
 
         for (String aprsLine : aprsPhrases) {
@@ -82,6 +94,13 @@ public class IgcLoggerTest {
             logger.log(beacon.getId(), beacon.getLat(), beacon.getLon(), beacon.getAlt(), aprsLine);
         }
 
+        // wait a bit..
+        Thread.sleep(600);
+
+        commonVerification();
+    }
+
+    private void commonVerification() throws Exception {
         // make sure files were created
         // delete log folder if it exists
         Path dir = Paths.get("log/" + date);
@@ -91,7 +110,6 @@ public class IgcLoggerTest {
         Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                // System.out.println(file.getFileName());
                 files.add(file);
                 return FileVisitResult.CONTINUE;
             }
