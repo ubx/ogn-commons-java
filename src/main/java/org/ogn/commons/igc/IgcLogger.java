@@ -235,6 +235,14 @@ public class IgcLogger {
 
     }
 
+    /**
+     * can be used to stop the poller thread. only affects IgcLogger in ASYNC mode
+     */
+    public void stop() {
+        if (pollerFuture != null) {
+            pollerFuture.cancel(false);
+        }
+    }
 }
 
 /*
