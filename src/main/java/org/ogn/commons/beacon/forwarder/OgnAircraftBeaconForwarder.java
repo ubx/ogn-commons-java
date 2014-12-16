@@ -9,7 +9,7 @@ import org.ogn.commons.beacon.AircraftDescriptor;
 
 public interface OgnAircraftBeaconForwarder extends OgnBeaconForwarder {
     /**
-     * plugin should implement this interface to deliver beacon to destination system
+     * plug-in should implement this interface to deliver beacon to destination system
      * 
      * @param beacon OGN beacon
      */
