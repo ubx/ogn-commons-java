@@ -32,6 +32,8 @@ public class FlarmNet {
 
     private static final String DEFAULT_FLARMNET_FILE_URL = "http://flarmnet.org/files/data.fln";
 
+    private static final String PROTOCOL_FILE = "file";
+
     private ConcurrentMap<String, AircraftDescriptor> flarmNetCache = new ConcurrentHashMap<>();
 
     private String flarmnetFileUri;
@@ -59,7 +61,7 @@ public class FlarmNet {
             try {
                 url = new URL(flarmnetFileUri);
 
-                if (url.getProtocol().equals("file")) {
+                if (url.getProtocol().equals(PROTOCOL_FILE)) {
                     String path = url.getPath().substring(1); // get rid of leading slash
                     br = new BufferedReader(new FileReader(path));
                 } else {
