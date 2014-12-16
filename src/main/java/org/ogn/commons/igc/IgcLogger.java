@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ogn.commons.utils.AprsUtils;
+import org.ogn.commons.utils.AprsUtils.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,13 +106,16 @@ public class IgcLogger {
 
     private void writeIgcHeader(FileWriter igcFile, Calendar calendar, String immat) {
         // Write IGC file header
+        StringBuilder bld = new StringBuilder();
         try {
-            igcFile.write("AGNE001Glider network gateway" + LINE_SEP);
-            igcFile.write("HFDTE" + String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH))
-                    + String.format("%02d", calendar.get(Calendar.MONTH) + 1)
-                    + String.format("%04d", calendar.get(Calendar.YEAR)).substring(2) + // last 2 chars of the year
-                    LINE_SEP);
-            igcFile.write("HFGIDGLIDERID:" + immat + LINE_SEP);
+            bld.append("AGNE001Glider network gateway").append(LINE_SEP);
+            bld.append("HFDTE").append(String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)))
+                    .append(String.format("%02d", calendar.get(Calendar.MONTH) + 1))
+                    .append(String.format("%04d", calendar.get(Calendar.YEAR)).substring(2)) // last 2 chars of the year
+                    .append(LINE_SEP);
+
+            igcFile.write(bld.toString());
+
         } catch (IOException e) {
             LOG.error("exception caught", e);
         }
@@ -168,35 +172,25 @@ public class IgcLogger {
 
         // Add fix
         try {
-            char latitudeWay = 'N';
-            if (lat < 0.0f)
-                latitudeWay = 'S';
-            char longitudeWay = 'E';
-            if (lon < 0.0f)
-                longitudeWay = 'W';
+
+            StringBuilder bld = new StringBuilder();
 
             if (comment != null) {
                 // log original APRS sentence to IGC file for debug, SAR & co
-                igcFile.write("LGNE " + comment + LINE_SEP);
+                bld.append("LGNE ").append(comment).append(LINE_SEP);
             }
 
-            igcFile.write("B"
-                    + // Fix
-                    String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY))
-                    + // Time of day
-                    String.format("%02d", calendar.get(Calendar.MINUTE))
-                    + String.format("%02d", calendar.get(Calendar.SECOND))
-                    + String.format("%07.0f", Math.abs(AprsUtils.degToDms(lat) * 100 * 100 * 10)) + latitudeWay
-                    + String.format("%08.0f", Math.abs(AprsUtils.degToDms(lon) * 100 * 100 * 10)) + longitudeWay + "A" + // A
-                                                                                                                         // for
-                                                                                                                         // 3D
-                                                                                                                         // fix
-                                                                                                                         // (and
-                                                                                                                         // not
-                                                                                                                         // 2D)
-                    "00000" + // Baro altitude (but it is false as we have only GPS altitude
-                    String.format("%05.0f", alt) + // GPS altitude
-                    LINE_SEP);
+            bld.append("B").append(String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY)))
+                    .append(String.format("%02d", calendar.get(Calendar.MINUTE)))
+                    .append(String.format("%02d", calendar.get(Calendar.SECOND)))
+                    .append(AprsUtils.degToIgc(lat, Coordinate.LAT)).append(AprsUtils.degToIgc(lon, Coordinate.LON))
+                    .append("A") // A for 3D fix (and not 2D)
+                    .append("00000") // baro. altitude (but it is false as we have only GPS altitude
+                    .append(String.format("%05.0f", alt)) // GPS altitude
+                    .append(LINE_SEP);
+
+            igcFile.write(bld.toString());
+
         } catch (IOException e) {
             LOG.error("exception caught", e);
         } finally {

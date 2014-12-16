@@ -52,15 +52,48 @@ public class AprsUtils {
     }
 
     public static double dmsToDeg(double dms) {
-        double d = Math.floor(dms);
+        double d = Math.floor(Math.abs(dms));
         double m = (dms - d) * 100 / 60;
         return (d + m);
     }
 
     public static double degToDms(double deg) {
-        double d = Math.floor(deg);
-        double m = (deg - d) * 60 / 100;
+        double absDeg = Math.abs(deg);
+        double d = Math.floor(absDeg);
+        double m = (absDeg - d) * 60 / 100;
         return (d + m);
+    }
+
+    public static enum Coordinate {
+        LAT,
+        LON;
+    }
+
+    public static String degToIgc(double deg, Coordinate what) {
+        StringBuilder result = new StringBuilder();
+
+        char sign = 'S';
+        switch (what) {
+        case LAT:
+            if (deg < 0.0f)
+                sign = 'S';
+            else
+                sign = 'N';
+
+            result.append(String.format("%07.0f", Math.abs(degToDms(deg) * 100 * 100 * 10)));
+            break;
+        case LON:
+            if (deg < 0.0f)
+                sign = 'W';
+            else
+                sign = 'E';
+
+            result.append(String.format("%08.0f", Math.abs(degToDms(deg) * 100 * 100 * 10)));
+            break;
+        }
+
+        result.append(sign);
+        return result.toString();
     }
 
     public static double degToMeters(double deg) {

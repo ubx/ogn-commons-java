@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.junit.Test;
+import org.ogn.commons.utils.AprsUtils.Coordinate;
 
 public class AprsUtilsTest {
 
@@ -55,6 +56,24 @@ public class AprsUtilsTest {
     }
 
     @Test
+    public void testDegToDms() {
+        double lat = 51.179500000000004;
+        double lon = -1.0328333333333335;
+
+        assertEquals(51.1077f, AprsUtils.degToDms(lat), 0.01f);
+        assertEquals(1.0197f, AprsUtils.degToDms(lon), 0.01f);
+    }
+
+    @Test
+    public void testDegToIgc() {
+        double lat = 51.179500000000004;
+        double lon = -1.0328333333333335;
+
+        assertEquals("5110770N", AprsUtils.degToIgc(lat, Coordinate.LAT));
+        assertEquals("00101970W", AprsUtils.degToIgc(lon, Coordinate.LON));
+    }
+
+    @Test
     public void testToUtcTimestamp() {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         Date d = new Date();
@@ -92,5 +111,4 @@ public class AprsUtilsTest {
         assertEquals(0, t - timestamp);
         assertTrue(t % 1000 == 0);
     }
-
 }
