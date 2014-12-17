@@ -52,8 +52,9 @@ public class AprsUtils {
     }
 
     public static double dmsToDeg(double dms) {
-        double d = Math.floor(Math.abs(dms));
-        double m = (dms - d) * 100 / 60;
+        double absDms = Math.abs(dms);
+        double d = Math.floor(absDms);       
+        double m = (absDms - d) * 100 / 60;
         return (d + m);
     }
 

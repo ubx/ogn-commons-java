@@ -51,7 +51,7 @@ public class AprsUtilsTest {
     }
 
     @Test
-    public void test2() {
+    public void testDegToMeters() {
         assertEquals(111194.926, AprsUtils.degToMeters(1.0f), 0.01);
     }
 
@@ -59,9 +59,9 @@ public class AprsUtilsTest {
     public void testDegToDms() {
         double lat = 51.179500000000004;
         double lon = -1.0328333333333335;
-
         assertEquals(51.1077f, AprsUtils.degToDms(lat), 0.01f);
-        assertEquals(1.0197f, AprsUtils.degToDms(lon), 0.01f);
+        assertEquals(1.0197f, AprsUtils.degToDms(lon), 0.01f);      
+        assertEquals(lat,AprsUtils.dmsToDeg(AprsUtils.degToDms(lat)),1e-10f);
     }
 
     @Test
