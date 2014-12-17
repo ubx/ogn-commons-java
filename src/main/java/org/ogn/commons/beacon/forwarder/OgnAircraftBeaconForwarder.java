@@ -7,11 +7,16 @@ package org.ogn.commons.beacon.forwarder;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 
+/**
+ * this interface is to be implemented by plugins to the ogn gateway
+ * 
+ * @author wbuczak
+ */
 public interface OgnAircraftBeaconForwarder extends OgnBeaconForwarder {
+
     /**
-     * plug-in should implement this interface to deliver beacon to destination system
-     * 
-     * @param beacon OGN beacon
+     * @param beacon and AircraftBeacon
+     * @param descriptor static aircraft description
      */
     void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor);
 }
