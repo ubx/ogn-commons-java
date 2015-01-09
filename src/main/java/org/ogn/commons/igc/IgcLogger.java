@@ -90,6 +90,7 @@ public class IgcLogger {
     }
 
     public IgcLogger(final String logsFolder, Mode mode) {
+        LOG.info("creating igc logger [log-folder: {}, mode: {}]",logsFolder,mode);
         igcBaseDir = logsFolder;
         workingMode = mode;
 
@@ -102,6 +103,10 @@ public class IgcLogger {
 
     public IgcLogger() {
         this(DEFAULT_IGC_BASE_DIR, Mode.ASYNC);
+    }
+
+    public IgcLogger(final String logsFolder) {
+        this(logsFolder, Mode.ASYNC);
     }
 
     private void writeIgcHeader(FileWriter igcFile, Calendar calendar, String immat) {
