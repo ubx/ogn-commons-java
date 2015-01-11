@@ -49,4 +49,23 @@ public class AprsLineParserTest {
         assertNull(beacon);
     }
 
+    @Test
+    public void test2() {
+        String brBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/140044h5227.15N/00108.34E'286/023/A=001200 id06DDDBBC +653fpm +0.7rot 9.0dB 0e +1.8kHz gps2x3 hearE61E";
+
+        String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
+
+        AprsLineParser parser = AprsLineParser.get();
+
+        OgnBeacon beacon = parser.parse(brBeacon);
+
+        assertNotNull(beacon);
+        assertTrue(beacon instanceof AircraftBeacon);
+
+        beacon = parser.parse(recBeacon);
+
+        assertNotNull(beacon);
+        assertTrue(beacon instanceof ReceiverBeacon);
+    }
+
 }

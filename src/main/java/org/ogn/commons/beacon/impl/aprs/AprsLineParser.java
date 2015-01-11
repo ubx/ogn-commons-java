@@ -23,7 +23,12 @@ public class AprsLineParser {
     private static final String RF_TOKEN = "RF:";
     private static final String CPU_TOKEN = "CPU:";
 
-    private Pattern p = Pattern.compile(APRS_SENTENCE_PATTERN);
+    private static Pattern p = Pattern.compile(APRS_SENTENCE_PATTERN);
+
+    private static Pattern rfPattern = Pattern
+            .compile("(.)+ RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB.*");
+
+    private static Pattern cpuPattern = Pattern.compile("(.)+ CPU:(\\d+\\.\\d+).*");
 
     private static Logger LOG = LoggerFactory.getLogger(AprsLineParser.class);
 
@@ -48,18 +53,24 @@ public class AprsLineParser {
 
         if (m1.matches()) {
             if (!aprsLine.startsWith(APRS_SRV_MSG_FIRST_CHARACTER)) {
-                if (!aprsLine.contains(RF_TOKEN) && !(aprsLine.contains(CPU_TOKEN))) {
-                    if (processAircraftBeacons) {
-                        // match aircraft beacons
-                        LOG.debug("Aircraft beacon: {}", aprsLine);
-                        result = new AprsAircraftBeacon(aprsLine);
-                    }
-                } else {
+
+                // receiver beacons are supposed to have RF and CPU information
+                if (rfPattern.matcher(aprsLine).matches() && cpuPattern.matcher(aprsLine).matches()) {
+
                     if (processReceiverBeacons) {
                         // match receiver beacons
                         LOG.debug("Receiver beacon: {}", aprsLine);
                         result = new AprsReceiverBeacon(aprsLine);
                     }
+
+                } else {
+
+                    if (processAircraftBeacons) {
+                        // match aircraft beacons
+                        LOG.debug("Aircraft beacon: {}", aprsLine);
+                        result = new AprsAircraftBeacon(aprsLine);
+                    }
+
                 }
             }
 

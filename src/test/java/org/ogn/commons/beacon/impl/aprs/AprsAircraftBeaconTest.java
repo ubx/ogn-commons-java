@@ -18,12 +18,15 @@ import java.util.List;
 import org.junit.Test;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.utils.AprsUtils;
+import org.ogn.commons.utils.JsonUtils;
 
 public class AprsAircraftBeaconTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        String acBeacon = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
+        String acBeacon =
+
+        "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
 
         AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
         AircraftBeacon b2 = new AprsAircraftBeacon(acBeacon);
@@ -41,11 +44,11 @@ public class AprsAircraftBeaconTest {
 
         assertNotNull(b1);
 
-        assertEquals(acBeacon,b1.getRawPacket());
-        
+        assertEquals(acBeacon, b1.getRawPacket());
+
         assertEquals("PH-844", b1.getId());
-        
-        assertEquals(0,AprsUtils.toUtcTimestamp(10, 25, 29)-b1.getTimestamp());
+
+        assertEquals(0, AprsUtils.toUtcTimestamp(10, 25, 29) - b1.getTimestamp());
 
         assertEquals(GLIDER, b1.getAircraftType());
         assertEquals(-2.4f, b1.getClimbRate(), 0.1);
@@ -79,8 +82,8 @@ public class AprsAircraftBeaconTest {
         String acBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
         AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
-        
-        assertEquals(acBeacon,b1.getRawPacket());
+
+        assertEquals(acBeacon, b1.getRawPacket());
 
         // still, the object should be created (although its attributes won't be initialized)
         assertNotNull(b1);
@@ -104,6 +107,18 @@ public class AprsAircraftBeaconTest {
         AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
         assertNull(b1.getGpsStatus());
+    }
+    
+    @Test
+    public void test5() {
+        String acBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/144659h5227.48N/00110.18E'182/045/A=000508 id06DDDBBC -177fpm +0.5rot 7.0dB 1e +2.0kHz, gps2x3";
+        
+        AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+        acBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/144659h5227.48N/00110.18E'182/045/A=000508 id06DDDBBC -177fpm +0.5rot 7.0dB 1e +2.0kHz gps2x3";
+        b1 = new AprsAircraftBeacon(acBeacon);
+        
+        System.out.println(JsonUtils.toJson(b1));
+      
     }
 
 }
