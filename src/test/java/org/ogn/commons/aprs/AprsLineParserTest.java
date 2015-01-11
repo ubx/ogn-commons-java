@@ -66,6 +66,12 @@ public class AprsLineParserTest {
 
         assertNotNull(beacon);
         assertTrue(beacon instanceof ReceiverBeacon);
+        
+        recBeacon = "ESSX>APRS,TCPIP*,qAC,GLIDERN1:/213502h5934.92NI01630.18E&/A=000026 NTP:16000.0ms/+0.0ppm +37.0C RF:+49+0.0ppm/+0.9dB";
+        beacon = parser.parse(recBeacon);
+
+        assertNotNull(beacon);
+        assertTrue(beacon instanceof ReceiverBeacon);               
     }
 
 }

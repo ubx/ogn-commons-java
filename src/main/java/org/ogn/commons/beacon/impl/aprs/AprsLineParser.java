@@ -54,8 +54,8 @@ public class AprsLineParser {
         if (m1.matches()) {
             if (!aprsLine.startsWith(APRS_SRV_MSG_FIRST_CHARACTER)) {
 
-                // receiver beacons are supposed to have RF and CPU information
-                if (rfPattern.matcher(aprsLine).matches() && cpuPattern.matcher(aprsLine).matches()) {
+                // receiver beacons are supposed to have RF and/or CPU information
+                if (rfPattern.matcher(aprsLine).matches() || cpuPattern.matcher(aprsLine).matches()) {
 
                     if (processReceiverBeacons) {
                         // match receiver beacons
