@@ -44,7 +44,7 @@ public class JsonUtils {
 
     public static String toJson(Object obj) {
         String result = null;
-
+  
         StringWriter str = new StringWriter();
 
         try {
@@ -52,7 +52,6 @@ public class JsonUtils {
             result = str.toString();
         } catch (Exception ex) {
             LOG.error("serialization to JSON failed", ex);
-            ex.printStackTrace();
         }
 
         return result;

@@ -226,8 +226,8 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
             }
         }
 
-        if (!unmachedParams.isEmpty()) {
-            LOG.warn("Unmatched aprs parms: {}", unmachedParams);
+        if (!unmachedParams.isEmpty()) {            
+            LOG.warn("Unmatched aprs parms: {} aprs-sentence: {}", unmachedParams, aprsSentence);
         }
     }
 
