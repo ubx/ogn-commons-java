@@ -26,9 +26,6 @@ public class AprsReceiverBeaconTest {
         assertNotSame(b1, b2);
     }
 
-    // "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
-   
-    
     @Test
     public void test1() {
         String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
@@ -36,13 +33,13 @@ public class AprsReceiverBeaconTest {
 
         assertNotNull(b1);
 
-        assertEquals(recBeacon,b1.getRawPacket());
-        
+        assertEquals(recBeacon, b1.getRawPacket());
+
         assertEquals("EBZW", b1.getId());
-        assertEquals("1.0.4",b1.getVersion());
-        assertEquals(100004,b1.getNumericVersion());
-        
-        assertEquals("GLIDERN1",b1.getServerName());
+        assertEquals("1.0.4", b1.getVersion());
+        assertEquals(100004, b1.getNumericVersion());
+
+        assertEquals("GLIDERN1", b1.getServerName());
 
         assertEquals(51.0143333f, b1.getLat(), 0.0001);
         assertEquals(5.52383333f, b1.getLon(), 0.0001);
@@ -67,7 +64,11 @@ public class AprsReceiverBeaconTest {
         b1 = new AprsReceiverBeacon(recBeacon);
         assertEquals(40.6, b1.getCpuTemp(), 0.01);
         assertNull(b1.getVersion());
-        assertEquals(0,b1.getNumericVersion());
+        assertEquals(0, b1.getNumericVersion());
+
+        recBeacon = "MotServlx>APRS,TCPIP*,qAC,GLIDERN2:/111734h4535.55NI00551.73E&/A=001007 v0.1.4 CPU:0.0 RAM:93.4/867.3MB NTP:0.6ms/-2.4ppm RF:+60+0.0ppm";
+        b1 = new AprsReceiverBeacon(recBeacon);
+        System.out.println(b1.getRecCrystalCorrection());
 
     }
 
@@ -76,8 +77,8 @@ public class AprsReceiverBeaconTest {
         String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
         ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
-        
-        assertEquals(recBeacon,b1.getRawPacket());
+
+        assertEquals(recBeacon, b1.getRawPacket());
 
         // still, the object should be created (although its attributes will not be initialized)
         assertNotNull(b1);
