@@ -72,6 +72,18 @@ public class AprsLineParserTest {
 
         assertNotNull(beacon);
         assertTrue(beacon instanceof ReceiverBeacon);
+                        
+    }
+    
+    @Test
+    public void test3() {
+        String corruptedBeacon = "F-PVVA>APRS,qAS,CHALLES:/130435h4534.95N/00559.83E'237/105/A=002818|$#*IL<&z#XLx|";
+        AprsLineParser parser = AprsLineParser.get();
+
+        OgnBeacon beacon = parser.parse(corruptedBeacon);
+
+        assertNotNull(beacon);
+        
     }
 
 }

@@ -22,7 +22,11 @@ public class FlarmNetTest {
 
         final FlarmNet fnet = new FlarmNet();
         fnet.reload();
-        AircraftDescriptor desc = fnet.getDescriptor("DF08E8"); // FLARM address
+
+        AircraftDescriptor desc = fnet.getDescriptor(null);
+        assertNull(desc);
+
+        desc = fnet.getDescriptor("DF08E8"); // FLARM address
         assertNotNull(desc);
 
         System.out.println(JsonUtils.toJson(desc));
@@ -78,7 +82,7 @@ public class FlarmNetTest {
             assertEquals("EED", desc.getCN());
             assertEquals("Bicester Gliding", desc.getOwner());
             assertEquals("Ka-8", desc.getModel());
-            assertEquals("129.975", desc.getFreq());                                               
+            assertEquals("129.975", desc.getFreq());
 
             desc = fnet.getDescriptor("some-not-existing");
             assertNull(desc);
@@ -89,7 +93,7 @@ public class FlarmNetTest {
         t1.join();
         t2.join();
     }
-    
+
     @Test
     public void testCaching() {
         FlarmNet fnet = new FlarmNet();
@@ -97,26 +101,25 @@ public class FlarmNetTest {
         fnet.reload();
         AircraftDescriptor desc = fnet.getDescriptor("3ECE59"); // FLARM address
         assertNotNull(desc);
-        System.out.println(JsonUtils.toJson(desc));        
+        System.out.println(JsonUtils.toJson(desc));
         assertTrue(desc.isKnown());
-        assertEquals("D-KTCJ",desc.getRegNumber());
+        assertEquals("D-KTCJ", desc.getRegNumber());
         long t2 = System.currentTimeMillis();
         long dt = t2 - t1;
-              
+
         desc = fnet.getDescriptor("3ECE59"); // FLARM address
         desc = fnet.getDescriptor("3ECE59");
         desc = fnet.getDescriptor("3ECE59");
         desc = fnet.getDescriptor("3ECE59");
         assertNotNull(desc);
-        System.out.println(JsonUtils.toJson(desc));        
+        System.out.println(JsonUtils.toJson(desc));
         assertTrue(desc.isKnown());
-        assertEquals("D-KTCJ",desc.getRegNumber());
+        assertEquals("D-KTCJ", desc.getRegNumber());
         long t3 = System.currentTimeMillis();
         long dt2 = t3 - t2;
-        assertTrue (dt2 < dt);
+        assertTrue(dt2 < dt);
     }
-    
-    
+
     @Test
     public void testWithLocalFlarmnetDb() throws Exception {
         FlarmNet fnet = new FlarmNet("src/test/resources/data.fln");
@@ -129,7 +132,7 @@ public class FlarmNetTest {
         desc = fnet.getDescriptor("DDD587"); // FLARM address
         System.out.println(JsonUtils.toJson(desc));
         assertNotNull(desc);
-        
+
         fnet = new FlarmNet("file:///src/test/resources/data.fln");
         fnet.reload();
         desc = fnet.getDescriptor("DF08E8"); // FLARM address

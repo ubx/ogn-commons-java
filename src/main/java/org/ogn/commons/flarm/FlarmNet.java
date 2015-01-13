@@ -111,6 +111,8 @@ public class FlarmNet {
     }
 
     public AircraftDescriptor getDescriptor(String id) {
+        if (id == null)
+            return null;
         return flarmNetCache.get(id);
     }
 }
