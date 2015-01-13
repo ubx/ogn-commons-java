@@ -52,7 +52,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
     /**
      * id can be either ICAO, FLARM or OGN
      */
-    protected AddressType addressType;
+    protected AddressType addressType = AddressType.UNRECOGNIZED;
 
     /**
      * type of an aircraft (Glider, tow plane, helicopter, etc..)

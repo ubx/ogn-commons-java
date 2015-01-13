@@ -14,6 +14,7 @@ import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.impl.aprs.AprsLineParser;
+import org.ogn.commons.utils.JsonUtils;
 
 public class AprsLineParserTest {
 
@@ -83,6 +84,8 @@ public class AprsLineParserTest {
         OgnBeacon beacon = parser.parse(corruptedBeacon);
 
         assertNotNull(beacon);
+        
+        System.out.println(JsonUtils.toJson(beacon));
         
     }
 

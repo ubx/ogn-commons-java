@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.utils.AprsUtils;
 import org.ogn.commons.utils.JsonUtils;
@@ -24,9 +25,7 @@ public class AprsAircraftBeaconTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        String acBeacon =
-
-        "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
+        String acBeacon = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
 
         AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
         AircraftBeacon b2 = new AprsAircraftBeacon(acBeacon);
@@ -108,17 +107,18 @@ public class AprsAircraftBeaconTest {
 
         assertNull(b1.getGpsStatus());
     }
-    
+
     @Test
     public void test5() {
-        String acBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/144659h5227.48N/00110.18E'182/045/A=000508 id06DDDBBC -177fpm +0.5rot 7.0dB 1e +2.0kHz, gps2x3";
-        
+        // test against incorrect beacon format
+
+        String acBeacon = "F-PVVA>APRS,qAS,CHALLES:/130435h4534.95N/00559.83E'237/105/A=002818|$#*IL<&z#XLx|";
         AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
-        acBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/144659h5227.48N/00110.18E'182/045/A=000508 id06DDDBBC -177fpm +0.5rot 7.0dB 1e +2.0kHz gps2x3";
-        b1 = new AprsAircraftBeacon(acBeacon);
-        
+
+        assertNotNull(acBeacon);
         System.out.println(JsonUtils.toJson(b1));
-      
+
+        assertEquals(AddressType.UNRECOGNIZED, b1.getAddressType());
     }
 
 }
