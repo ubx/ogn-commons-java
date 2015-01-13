@@ -4,7 +4,6 @@
 
 package org.ogn.commons.beacon.forwarder;
 
-
 /**
  * This interface is to be implemented by all OGN gateway packet forwarder plugins. Packet Forwarders are services
  * sending data to different systems (e.g. FR24,...)
@@ -12,6 +11,16 @@ package org.ogn.commons.beacon.forwarder;
  * @author wbuczak
  */
 public interface OgnBeaconForwarder {
+
+    /**
+     * a plugin may require initialization (this interface is called by the ogn gateway)
+     */
+    void init();
+        
+    /**
+     * before removing a plugin will be called to stop/release its resources (e.g. thread pools, file handles, sockets..)
+     */
+    void stop();
 
     /**
      * @return short plugin's name
@@ -27,5 +36,5 @@ public interface OgnBeaconForwarder {
      * @return plugin's description (where does it send data to, etc..)
      */
     String getDescription();
-   
+
 }
