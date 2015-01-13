@@ -123,4 +123,9 @@ public class TimeWindowBuffer<T> {
         }
         return result;
     }
+
+    public void stop() {
+        timer.cancel();
+        timer = null;
+    }
 }

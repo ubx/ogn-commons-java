@@ -10,8 +10,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Random;
 
 import org.junit.Test;
-import org.ogn.commons.collections.TimeWindowBuffer;
-import org.ogn.commons.collections.TimeWindowBufferListener;
 
 public class TimeWindowBufferTest {
 
@@ -61,6 +59,14 @@ public class TimeWindowBufferTest {
         buffer.add("s_t_r_i_n_g103");
         Thread.sleep(TIME_WINDOW * 2);
         assertEquals(0, buffer.size());
+
+        buffer.stop();
+        buffer.add("s_t_r_i_n_g104");
+        Thread.sleep(TIME_WINDOW * 2);
+        // since we've stopped the buffer the message
+        // are not expected to be digested
+        assertTrue(buffer.size() > 0);
+
     }
 
 }
