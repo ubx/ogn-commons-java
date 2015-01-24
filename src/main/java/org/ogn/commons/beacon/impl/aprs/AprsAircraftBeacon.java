@@ -235,10 +235,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
                 addressType = AddressType.forValue(Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 3); // 2
                 aircraftType = AircraftType
                         .forValue((Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b1111100) >>> 2);
-                if (((Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b10000000) >>> 7) == 1)
-                    stealth = true;
-                else
-                    stealth = false;
+                stealth = (Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b10000000) != 0;
             } else if ((matcher = climbRatePattern.matcher(aprsParam)).matches()) {
                 climbRate = feetsToMetres(Float.parseFloat(matcher.group(2))) / 60; // feets/m to m/s
                 if (matcher.group(1).equals("-"))
