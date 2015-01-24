@@ -36,8 +36,8 @@ public interface AircraftBeacon extends OgnBeacon {
     AircraftType getAircraftType();
 
     /**
-     * stealth mode active or not. This is for internal use only, because a standard client will NOT be notified by OGN
-     * infrastructure with aircraft beacons when stealth mode is on
+     * stealth mode active or not. This is for internal use only, because a standard client will NOT be receiving
+     * aircraft beacons with stealth flag on
      */
     boolean isStealth();
 
