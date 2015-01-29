@@ -56,7 +56,7 @@ public class FlarmNetDescriptorProvider implements AircraftDescriptorProvider {
     }
 
     @Override
-    public AircraftDescriptor getDescritor(String address) {
+    public AircraftDescriptor findDescriptor(String address) {
         return fn.getDescriptor(address);
     }
 

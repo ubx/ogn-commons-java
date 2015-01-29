@@ -18,5 +18,5 @@ public interface AircraftDescriptorProvider {
      * @param address hardware address (FLARM.ICAO,OGN..)
      * @return static aircraft's descriptor or null if unavailable
      */
-    AircraftDescriptor getDescritor(String address);
+    AircraftDescriptor findDescriptor(String address);
 }
