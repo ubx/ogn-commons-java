@@ -46,4 +46,7 @@ public interface AircraftDescriptor {
      */
     String getFreq();
 
+    boolean isTracked();
+
+    boolean isIdentified();
 }

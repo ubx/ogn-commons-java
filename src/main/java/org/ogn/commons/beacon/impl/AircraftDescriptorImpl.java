@@ -23,14 +23,23 @@ public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable 
      * @param home
      * @param model
      * @param freq
+     * @param tracked
+     * @param identified
      */
-    public AircraftDescriptorImpl(String regNumber, String cn, String owner, String home, String model, String freq) {
+    public AircraftDescriptorImpl(String regNumber, String cn, String owner, String home, String model, String freq,
+            boolean tracked, boolean identified) {
         this.regNumber = regNumber;
         this.cn = cn;
         this.owner = owner;
         this.homeBase = home;
         this.model = model;
         this.freq = freq;
+        this.tracked = tracked;
+        this.identified = identified;
+    }
+
+    public AircraftDescriptorImpl(String regNumber, String cn, String model, boolean tracked, boolean identified) {
+        this(regNumber, cn, null, null, model, null, tracked, identified);
     }
 
     private String regNumber;
@@ -39,6 +48,9 @@ public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable 
     private String homeBase;
     private String model;
     private String freq;
+
+    private boolean tracked;
+    private boolean identified;
 
     protected AircraftDescriptorImpl() {
     }
@@ -81,15 +93,27 @@ public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable 
     }
 
     @Override
+    public boolean isTracked() {
+        return tracked;
+    }
+
+    @Override
+    public boolean isIdentified() {
+        return identified;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((cn == null) ? 0 : cn.hashCode());
         result = prime * result + ((freq == null) ? 0 : freq.hashCode());
         result = prime * result + ((homeBase == null) ? 0 : homeBase.hashCode());
+        result = prime * result + (identified ? 1231 : 1237);
         result = prime * result + ((model == null) ? 0 : model.hashCode());
         result = prime * result + ((owner == null) ? 0 : owner.hashCode());
         result = prime * result + ((regNumber == null) ? 0 : regNumber.hashCode());
+        result = prime * result + (tracked ? 1231 : 1237);
         return result;
     }
 
@@ -117,6 +141,8 @@ public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable 
                 return false;
         } else if (!homeBase.equals(other.homeBase))
             return false;
+        if (identified != other.identified)
+            return false;
         if (model == null) {
             if (other.model != null)
                 return false;
@@ -131,6 +157,8 @@ public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable 
             if (other.regNumber != null)
                 return false;
         } else if (!regNumber.equals(other.regNumber))
+            return false;
+        if (tracked != other.tracked)
             return false;
         return true;
     }
