@@ -28,8 +28,7 @@ public class AprsUtilsTest {
 
         int last = 0;
         for (int i = 0; i < 100; i++) {
-            clientId = AprsUtils.generateClientId();
-            System.out.println(clientId);
+            clientId = AprsUtils.generateClientId();            
 
             int n = -1;
             String suffix = null;

@@ -10,11 +10,15 @@ import static org.junit.Assert.assertTrue;
 import java.util.Random;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TimeWindowBufferTest {
 
     static final long TIME_WINDOW = 500;
     static final int MAX_MSG_LENGTH = 150;
+
+    private static Logger LOG = LoggerFactory.getLogger(TimeWindowBufferTest.class);
 
     long t;
 
@@ -25,11 +29,12 @@ public class TimeWindowBufferTest {
             @Override
             public void tick(String msg) {
                 long t2 = System.currentTimeMillis();
-                System.out.println(t2 + " " + msg.length() + " " + msg);
+
+                LOG.debug("{} {} {}", t2, msg.length(), msg);
 
                 assertTrue(msg.length() <= MAX_MSG_LENGTH + "s_t_r_i_n_g99".length());
                 if (t > 0) {
-                    System.out.println(t2 - t);
+                    LOG.trace("{}", t2 - t);
                     assertTrue(t2 - t <= TIME_WINDOW + 10); // 10ms difference can be due to threading
                 }
                 t = t2;
