@@ -50,7 +50,7 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
             @Override
             public void run() {
 
-                LOG.debug("reloading db {}", db.getClass().getName());
+                LOG.info("reloading db {}", db.getClass().getName());
                 db.reload();
 
             }
