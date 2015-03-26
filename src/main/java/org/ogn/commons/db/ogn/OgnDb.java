@@ -15,14 +15,14 @@ public class OgnDb extends FileDb {
 
     private static Logger LOG = LoggerFactory.getLogger(OgnDb.class);
 
-    private static final String DEFAULT_OGN_FILE_URL = "http://live.glidernet.org/db/download";
+    private static final String DEFAULT_DEVICES_DB_URL = "http://devicesdb.glidernet.org/download";
 
     private static final String DELIMITER = ",";
     private static final String COMMENT = "#";
     private static final String YES = "Y";
 
     public OgnDb() {
-        this(DEFAULT_OGN_FILE_URL);
+        this(DEFAULT_DEVICES_DB_URL);
     }
 
     public OgnDb(String dbFileUri) {
@@ -66,7 +66,7 @@ public class OgnDb extends FileDb {
 
     @Override
     protected String getDefaultDbFileUri() {
-        return DEFAULT_OGN_FILE_URL;
+        return DEFAULT_DEVICES_DB_URL;
     }
 
 }
