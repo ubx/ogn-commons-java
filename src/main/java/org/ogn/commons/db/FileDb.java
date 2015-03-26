@@ -76,22 +76,29 @@ public abstract class FileDb {
             catch (MalformedURLException ex) {
                 // for malformed urls - still try to open it as a regular file
                 br = new BufferedReader(new FileReader(dbFileUri));
+            } catch (Exception ex) {
+                LOG.error("Exception exception caught", ex);
+                return;
             }
 
             String line;
             while ((line = br.readLine()) != null) {
-                AircraftDescriptorWithId record = processLine(line);
+                try {
+                    AircraftDescriptorWithId record = processLine(line);
 
-                if (record != null && record.id != null)
-                    if (cache.replace(record.id, record.desc) == null) {
-                        LOG.trace("putting into the cache record with key: {}",record.id);
-                        cache.put(record.id, record.desc);
-                    }
+                    if (record != null && record.id != null)
+                        if (cache.replace(record.id, record.desc) == null) {
+                            LOG.trace("putting into the cache record with key: {}", record.id);
+                            cache.put(record.id, record.desc);
+                        }
+                } catch (Exception e) {
+                    LOG.error("Exception exception caught", e);
+                }
 
             }// while
+
         } catch (Exception e) {
             LOG.error("Exception exception caught", e);
-            e.printStackTrace();
         } finally {
             try {
                 if (br != null)

@@ -42,6 +42,10 @@ public class OgnDb extends FileDb {
 
         String[] tokens = str.split(DELIMITER);
 
+        if (tokens.length < 6)
+            throw new IllegalArgumentException(
+                    "this line does not comply with the expected ogn devdb. record's format: " + line);
+
         String id = tokens[0].substring(1, tokens[0].length() - 1).trim();
         String model = tokens[1].substring(1, tokens[1].length() - 1).trim();
         String regNumber = tokens[2].substring(1, tokens[2].length() - 1).trim();
