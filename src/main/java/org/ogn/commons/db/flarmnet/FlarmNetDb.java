@@ -19,10 +19,10 @@ public class FlarmNetDb extends FileDb {
 
     private static Logger LOG = LoggerFactory.getLogger(FlarmNetDb.class);
 
-    private static final String DEFAULT_FLARMNET_FILE_URL = "http://flarmnet.org/files/data.fln";
+    private static final String DEFAULT_FLARMNET_DB_URL = "http://flarmnet.org/files/data.fln";
 
     public FlarmNetDb() {
-        this(DEFAULT_FLARMNET_FILE_URL);
+        this(DEFAULT_FLARMNET_DB_URL);
     }
 
     public FlarmNetDb(String flarmnetFileUri) {
@@ -57,6 +57,6 @@ public class FlarmNetDb extends FileDb {
 
     @Override
     protected String getDefaultDbFileUri() {        
-        return DEFAULT_FLARMNET_FILE_URL;
+        return DEFAULT_FLARMNET_DB_URL;
     }
 }
