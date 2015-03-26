@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Random;
 
@@ -118,5 +119,31 @@ public class OgnDbTest {
         long t3 = System.currentTimeMillis();
         long dt2 = t3 - t2;
         assertTrue(dt2 < dt);
+    }
+
+    @Test
+    public void testMalformedUrl() throws Exception {
+        final OgnDb ogndb = new OgnDb("http/live.glidernet.org/db/download");
+        try {
+            ogndb.reload();
+        } catch (Exception ex) {
+            fail("Exception not expected");
+        }
+
+        AircraftDescriptor desc = ogndb.getDescriptor("DD83CE");
+        assertNull(desc);
+    }
+
+    @Test
+    public void testResourceNotFound() throws Exception {
+        final OgnDb ogndb = new OgnDb("http://live.glidernet.org/wrong-location");
+        try {
+            ogndb.reload();
+        } catch (Exception ex) {
+            fail("Exception not expected");
+        }
+
+        AircraftDescriptor desc = ogndb.getDescriptor("DD83CE");
+        assertNull(desc);
     }
 }
