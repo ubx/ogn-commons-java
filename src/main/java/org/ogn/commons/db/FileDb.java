@@ -49,6 +49,10 @@ public abstract class FileDb {
         this.dbFileUri = dbFileUri == null ? getDefaultDbFileUri() : dbFileUri;
     }
 
+    public String getUrl() {
+        return this.dbFileUri;
+    }
+
     protected abstract String getDefaultDbFileUri();
 
     protected abstract AircraftDescriptorWithId processLine(String line);
@@ -77,7 +81,7 @@ public abstract class FileDb {
                 // for malformed urls - still try to open it as a regular file
                 br = new BufferedReader(new FileReader(dbFileUri));
             } catch (Exception ex) {
-                LOG.error("Exception exception caught", ex);
+                LOG.error("Exception caught", ex);
                 return;
             }
 
@@ -92,20 +96,20 @@ public abstract class FileDb {
                             cache.put(record.id, record.desc);
                         }
                 } catch (Exception e) {
-                    LOG.error("Exception exception caught", e);
+                    LOG.error("Exception caught", e);
                 }
 
             }// while
 
         } catch (Exception e) {
-            LOG.error("Exception exception caught", e);
+            LOG.error("Exception caught", e);
         } finally {
             try {
                 if (br != null)
                     br.close();
             } catch (Exception e) {
                 // nothing can be done, apart from logging
-                LOG.warn("Exception exception caught", e);
+                LOG.warn("Exception caught", e);
             }
         }
     }

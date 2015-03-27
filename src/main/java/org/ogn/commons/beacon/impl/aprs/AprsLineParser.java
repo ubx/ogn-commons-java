@@ -20,8 +20,6 @@ public class AprsLineParser {
     // # aprsc 2.0.14-g28c5a6a
     // # logresp PCBE13-1 unverified, server GLIDERN2
     private static final String APRS_SRV_MSG_FIRST_CHARACTER = "#";
-    private static final String RF_TOKEN = "RF:";
-    private static final String CPU_TOKEN = "CPU:";
 
     private static Pattern p = Pattern.compile(APRS_SENTENCE_PATTERN);
 

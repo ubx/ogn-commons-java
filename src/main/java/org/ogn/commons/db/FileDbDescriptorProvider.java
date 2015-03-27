@@ -31,12 +31,12 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
     private static final int DEFAULT_DB_INTERVAL = 60 * 60;
 
     public FileDbDescriptorProvider(Class<T> clazz, String dbFileUri, int dbRefreshInterval) {
-        LOG.debug(
-                "creating and initializing descriptor provider with parameters: dbFileUri: {}, dbRefreshInterval: {}",
-                dbFileUri, dbRefreshInterval);
 
         try {
             db = clazz.getConstructor(String.class).newInstance(dbFileUri);
+            LOG.info(
+                    "creating and initializing desciptor privider with parameters: uri: {}, refresh-interval: {} class: {}",
+                    db.getUrl(), dbRefreshInterval, clazz.getCanonicalName());
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
             LOG.error("instantiation of descriptor provider failed!", e);
@@ -50,7 +50,7 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
             @Override
             public void run() {
 
-                LOG.info("reloading db {}", db.getClass().getName());
+                LOG.debug("reloading db {}", db.getClass().getName());
                 db.reload();
 
             }
