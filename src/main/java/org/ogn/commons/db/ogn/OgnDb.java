@@ -15,7 +15,7 @@ public class OgnDb extends FileDb {
 
     private static Logger LOG = LoggerFactory.getLogger(OgnDb.class);
 
-    private static final String DEFAULT_DEVICES_DB_URL = "http://devicesdb.glidernet.org/download";
+    private static final String DEFAULT_DEVICES_DB_URL = "http://ddb.glidernet.org/download";
 
     private static final String DELIMITER = ",";
     private static final String COMMENT = "#";
@@ -44,7 +44,7 @@ public class OgnDb extends FileDb {
 
         if (tokens.length < 6)
             throw new IllegalArgumentException(
-                    "this line does not comply with the expected ogn devdb. record's format: " + line);
+                    "this line does not comply with the format: " + line);
 
         String id = tokens[0].substring(1, tokens[0].length() - 1).trim();
         String model = tokens[1].substring(1, tokens[1].length() - 1).trim();
