@@ -46,13 +46,15 @@ public class OgnDb extends FileDb {
             throw new IllegalArgumentException(
                     "this line does not comply with the format: " + line);
 
-        String id = tokens[0].substring(1, tokens[0].length() - 1).trim();
-        String model = tokens[1].substring(1, tokens[1].length() - 1).trim();
-        String regNumber = tokens[2].substring(1, tokens[2].length() - 1).trim();
-        String cn = tokens[3].substring(1, tokens[3].length() - 1).trim();
+        //DEVICE_TYPE,DEVICE_ID,AIRCRAFT_MODEL,REGISTRATION,CN,TRACKED,IDENTIFIED
+        
+        String id = tokens[1].substring(1, tokens[1].length() - 1).trim();
+        String model = tokens[2].substring(1, tokens[2].length() - 1).trim();
+        String regNumber = tokens[3].substring(1, tokens[3].length() - 1).trim();
+        String cn = tokens[4].substring(1, tokens[4].length() - 1).trim();
 
-        String tracked = tokens[4].substring(1, tokens[4].length() - 1).trim();
-        String identified = tokens[5].substring(1, tokens[5].length() - 1).trim();
+        String tracked = tokens[5].substring(1, tokens[5].length() - 1).trim();
+        String identified = tokens[6].substring(1, tokens[6].length() - 1).trim();
 
         AircraftDescriptor desc = new AircraftDescriptorImpl(regNumber, cn, model, toBoolean(tracked),
                 toBoolean(identified));
