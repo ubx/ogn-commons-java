@@ -15,28 +15,30 @@ import org.slf4j.LoggerFactory;
 
 public class TimeWindowBufferTest {
 
-    static final long TIME_WINDOW = 500;
-    static final int MAX_MSG_LENGTH = 150;
+    static final long TIME_WINDOW = 150;
+    static final int MAX_MSG_LENGTH = 20;
 
     private static Logger LOG = LoggerFactory.getLogger(TimeWindowBufferTest.class);
 
     long t;
+    int total = 0;
 
     @Test
     public void test() throws Exception {
         final TimeWindowBufferListener listener = new TimeWindowBufferListener() {
 
             @Override
-            public void tick(String msg) {
+            public void tick(String msg, int elements) {
                 long t2 = System.currentTimeMillis();
 
-                LOG.debug("{} {} {}", t2, msg.length(), msg);
+                LOG.debug("{} {} {}", t2, String.format("%03d", msg.length()), msg);
 
-                assertTrue(msg.length() <= MAX_MSG_LENGTH + "s_t_r_i_n_g99".length());
                 if (t > 0) {
-                    LOG.trace("{}", t2 - t);
-                    assertTrue(t2 - t <= TIME_WINDOW + 10); // 10ms difference can be due to threading
+                    long diff = t2 - t;
+                    LOG.debug("time diff: {} elements: {}", diff, elements);
                 }
+
+                total += elements;
                 t = t2;
             }
         };
@@ -44,34 +46,34 @@ public class TimeWindowBufferTest {
         TimeWindowBuffer<String> buffer = new TimeWindowBuffer<>(MAX_MSG_LENGTH, TIME_WINDOW, listener, "&");
 
         Random r = new Random(System.currentTimeMillis());
-        buffer.add("str0");
+
+        final int LOOP_1 = 5;
+        for (int i = 0; i < LOOP_1; i++) {
+            buffer.add("a");
+        }
 
         Thread.sleep(150);
 
-        for (int i = 1; i < 101; i++) {
-            buffer.add("s_t_r_i_n_g" + i);
-            Thread.sleep(5 + r.nextInt(40));
+        final int LOOP_2 = 205;
+        for (int i = 0; i < LOOP_2; i++) {
+            buffer.add("a");
+            Thread.sleep(5 + r.nextInt(20));
         }
 
-        Thread.sleep(TIME_WINDOW * 2);
+        Thread.sleep(TIME_WINDOW * 3);
 
-        assertEquals(0, buffer.size());
+        // make sure all elements have been processed
+        assertEquals(LOOP_1 + LOOP_2, total);
 
-        t = 0;
-        buffer.add("s_t_r_i_n_g102");
-
-        Thread.sleep(TIME_WINDOW - 100);
-        buffer.add("s_t_r_i_n_g103");
-        Thread.sleep(TIME_WINDOW * 2);
+        // no more elements expected in the buffer after processing
         assertEquals(0, buffer.size());
 
         buffer.stop();
-        buffer.add("s_t_r_i_n_g104");
+        buffer.add("a");
         Thread.sleep(TIME_WINDOW * 2);
-        // since we've stopped the buffer the message
+
+        // since the buffer is now stopped the messages
         // are not expected to be digested
         assertTrue(buffer.size() > 0);
-
     }
-
 }

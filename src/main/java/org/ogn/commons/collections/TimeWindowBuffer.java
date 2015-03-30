@@ -6,7 +6,6 @@ package org.ogn.commons.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,68 +18,62 @@ import java.util.TimerTask;
  * @author wbuczak
  * @param <T>
  */
-public class TimeWindowBuffer<T> {
+public class TimeWindowBuffer<T> extends ArrayList<T> {
 
+    private static final long serialVersionUID = -8204258873338667741L;
     private int strLen;
-    private final int maxStrLen;
+
+    private final int maxSize;
     private final long timeWindow;
     private final String delimiter;
 
     private Timer timer;
 
-    private List<T> buffer = new ArrayList<>();
-
-    private long t;
+    private transient long t;
 
     private TimeWindowBufferListener[] listeners;
 
-    public void add(T obj) {
-        synchronized (buffer) {
-            buffer.add(obj);
-
-            if (buffer.isEmpty())
-                strLen += obj.toString().length();
-            else
-                strLen += delimiter == null ? obj.toString().length() : obj.toString().length() + delimiter.length();
-
-            if (strLen > maxStrLen) {
-                notifyListenersAndClearBuffer();
-            }
+    @Override
+    public boolean add(T obj) {
+        synchronized (this) {
+            super.add(obj);
+            if (this.size() >= maxSize)
+                evaluate();
         }// sync
+
+        return true;
     }
 
-    private void notifyListenersAndClearBuffer() {
-        synchronized (buffer) {
+    private void evaluate() {
+        synchronized (this) {
             long ct = System.currentTimeMillis();
-            if (t > 0) {
 
-                // skip if buffer is not full and last iteration was less then (timeWindow>>4) ms ago
-                if (ct - t < (timeWindow >> 4) && strLen < maxStrLen) {
-                    return;
-                }
+            // skip if buffer is not full and last iteration was less then "timeWindow" ms ago
+            if ((ct - t < timeWindow) && this.size() < maxSize) {
+                return;
             }
-            t = ct;
 
-            String str = toStr(buffer);
+            t = ct;
+            String str = this.toStr();
             if (str.length() > 0)
                 synchronized (listeners) {
                     for (TimeWindowBufferListener l : listeners) {
-                        l.tick(str);
+                        l.tick(str, this.size());
                     }
                     // clear the buffer
-                    buffer.clear();
+                    this.clear();
                     strLen = 0;
                 }// sync
         }// sync
     }
 
-    private String toStr(List<? extends T> list) {
+    private String toStr() {
         StringBuilder strBld = new StringBuilder();
-        synchronized (list) {
+        synchronized (this) {
             int index = 0;
-            for (T s : list) {
+            for (T s : this) {
                 strBld.append(s);
-                if (++index < list.size() && delimiter != null)
+                if (++index < this.size() && delimiter != null)
                     strBld.append(delimiter);
             }
         }// sync
@@ -88,21 +81,20 @@ public class TimeWindowBuffer<T> {
         return strBld.toString();
     }
 
-    public TimeWindowBuffer(int maxStrLen, long timeWindowMs, final TimeWindowBufferListener listener) {
-        this(maxStrLen, timeWindowMs, new TimeWindowBufferListener[] { listener }, null);
+    public TimeWindowBuffer(int maxSize, long timeWindowMs, final TimeWindowBufferListener listener) {
+        this(maxSize, timeWindowMs, new TimeWindowBufferListener[] { listener }, null);
     }
 
-    public TimeWindowBuffer(int maxStrLen, long timeWindowMs, final TimeWindowBufferListener listener, String delimiter) {
-        this(maxStrLen, timeWindowMs, new TimeWindowBufferListener[] { listener }, delimiter);
+    public TimeWindowBuffer(int maxSize, long timeWindowMs, final TimeWindowBufferListener listener, String delimiter) {
+        this(maxSize, timeWindowMs, new TimeWindowBufferListener[] { listener }, delimiter);
     }
 
-    public TimeWindowBuffer(int maxStrLen, long timeWindowMs, final TimeWindowBufferListener[] listeners) {
-        this(maxStrLen, timeWindowMs, listeners, null);
+    public TimeWindowBuffer(int maxSize, long timeWindowMs, final TimeWindowBufferListener[] listeners) {
+        this(maxSize, timeWindowMs, listeners, null);
     }
 
-    public TimeWindowBuffer(int maxStrLen, long timeWindowMs, final TimeWindowBufferListener[] listeners,
-            String delimiter) {
-        this.maxStrLen = maxStrLen;
+    public TimeWindowBuffer(int maxSize, long timeWindowMs, final TimeWindowBufferListener[] listeners, String delimiter) {
+        this.maxSize = maxSize;
         this.timeWindow = timeWindowMs;
         this.listeners = Arrays.copyOf(listeners, listeners.length);
         this.delimiter = delimiter;
@@ -111,15 +103,16 @@ public class TimeWindowBuffer<T> {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                notifyListenersAndClearBuffer();
+                evaluate();
             }
         }, timeWindow, timeWindow);
     }
 
+    @Override
     public int size() {
         int result = 0;
-        synchronized (buffer) {
-            result = buffer.size();
+        synchronized (this) {
+            result = super.size();
         }
         return result;
     }

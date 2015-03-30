@@ -6,5 +6,5 @@
 package org.ogn.commons.collections;
 
 public interface TimeWindowBufferListener {
-    void tick(final String msg);
+    void tick(final String msg, int elements);
 }
