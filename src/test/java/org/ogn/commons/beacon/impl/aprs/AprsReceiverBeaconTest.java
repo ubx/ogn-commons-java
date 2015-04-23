@@ -29,6 +29,7 @@ public class AprsReceiverBeaconTest {
     @Test
     public void test1() {
         String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
+
         ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
 
         assertNotNull(b1);
@@ -66,9 +67,14 @@ public class AprsReceiverBeaconTest {
         assertNull(b1.getVersion());
         assertEquals(0, b1.getNumericVersion());
 
-        recBeacon = "MotServlx>APRS,TCPIP*,qAC,GLIDERN2:/111734h4535.55NI00551.73E&/A=001007 v0.1.4 CPU:0.0 RAM:93.4/867.3MB NTP:0.6ms/-2.4ppm RF:+60+0.0ppm";
+        // check a version with just noise in the RF
+        recBeacon = "Solothurn>APRS,TCPIP*,qAC,GLIDERN2:/220227h4712.67NI00731.89E&/A=001509 v0.2.2 CPU:0.8 RAM:301.2/456.4MB NTP:0.8ms/-37.7ppm +34.2C RF:+0.99dB";
         b1 = new AprsReceiverBeacon(recBeacon);
-        System.out.println(b1.getRecCrystalCorrection());
+        assertNotNull(b1);
+        assertEquals(0.0f, b1.getRecAbsCorrection(), 0.0001);
+        assertEquals(0, b1.getRecCrystalCorrection());
+        assertEquals(0.0f, b1.getRecCrystalCorrectionFine(), 0.0001);
+        assertEquals(0.99f, b1.getRecInputNoise(), 0.0001);
 
     }
 

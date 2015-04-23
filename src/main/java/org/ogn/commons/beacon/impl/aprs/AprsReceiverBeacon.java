@@ -98,6 +98,8 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
     private static final Pattern rfPattern = Pattern
             .compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB");
 
+    private static final Pattern rfPatternLight = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
+
     @Override
     public float getCpuLoad() {
         return cpuLoad;
@@ -194,10 +196,9 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
                     lon *= -1;
 
                 alt = feetsToMetres(Float.parseFloat(matcher.group(8)));
-            }
-            else if ((matcher = versionPattern.matcher(aprsParam)).matches()) {
+            } else if ((matcher = versionPattern.matcher(aprsParam)).matches()) {
                 version = matcher.group(1);
-            }else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
+            } else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
                 cpuLoad = Float.parseFloat(matcher.group(1));
             } else if ((matcher = cpuTempPattern.matcher(aprsParam)).matches()) {
                 cpuTemp = Float.parseFloat(matcher.group(2));
@@ -221,12 +222,17 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
                 recInputNoise = Float.parseFloat(matcher.group(6));
                 if (matcher.group(5).equals("-"))
                     recInputNoise *= -1;
+            } else if ((matcher = rfPatternLight.matcher(aprsParam)).matches()) {
+                recInputNoise = Float.parseFloat(matcher.group(2));
+                if (matcher.group(1).equals("-"))
+                    recInputNoise *= -1;
+
             } else {
                 unmachedParams.add(aprsParam);
             }
         }
 
-        if (!unmachedParams.isEmpty()) {                        
+        if (!unmachedParams.isEmpty()) {
             LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
         }
     }
