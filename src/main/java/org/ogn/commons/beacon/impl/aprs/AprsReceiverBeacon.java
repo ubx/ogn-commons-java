@@ -95,10 +95,16 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
     private static final Pattern cpuTempPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)C");
     private static final Pattern ramPattern = Pattern.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
     private static final Pattern ntpPattern = Pattern.compile("NTP:(\\d+\\.\\d+)ms/(\\+|\\-)(\\d+\\.\\d+)ppm");
-    private static final Pattern rfPattern = Pattern
+
+    private static final Pattern rfPatternFull = Pattern
             .compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB");
 
-    private static final Pattern rfPatternLight = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
+    private static final Pattern rfPatternLight1 = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
+
+    private static final Pattern rfPatternLight2 = Pattern.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm");
+
+    // Delft>APRS,TCPIP*,qAC,GLIDERN1:/100152h5200.69NI00421.98E&/A=000033 v0.1.3 CPU:0.0 RAM:77.5/458.6MB
+    // NTP:1.1ms/-52.0ppm +45.5C RF:+68+0.0ppm
 
     @Override
     public float getCpuLoad() {
@@ -212,7 +218,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
                 rtCrystalCorrection = Float.parseFloat(matcher.group(3));
                 if (matcher.group(2).equals("-"))
                     rtCrystalCorrection *= -1;
-            } else if ((matcher = rfPattern.matcher(aprsParam)).matches()) {
+            } else if ((matcher = rfPatternFull.matcher(aprsParam)).matches()) {
                 recCrystalCorrection = Integer.parseInt(matcher.group(2));
                 if (matcher.group(1).equals("-"))
                     recCrystalCorrection *= -1;
@@ -222,11 +228,17 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
                 recInputNoise = Float.parseFloat(matcher.group(6));
                 if (matcher.group(5).equals("-"))
                     recInputNoise *= -1;
-            } else if ((matcher = rfPatternLight.matcher(aprsParam)).matches()) {
+            } else if ((matcher = rfPatternLight1.matcher(aprsParam)).matches()) {
                 recInputNoise = Float.parseFloat(matcher.group(2));
                 if (matcher.group(1).equals("-"))
                     recInputNoise *= -1;
-
+            } else if ((matcher = rfPatternLight2.matcher(aprsParam)).matches()) {
+                recCrystalCorrection = Integer.parseInt(matcher.group(2));
+                if (matcher.group(1).equals("-"))
+                    recCrystalCorrection *= -1;
+                recCrystalCorrectionFine = Float.parseFloat(matcher.group(4));
+                if (matcher.group(3).equals("-"))
+                    recCrystalCorrectionFine *= -1;
             } else {
                 unmachedParams.add(aprsParam);
             }

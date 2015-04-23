@@ -76,6 +76,13 @@ public class AprsReceiverBeaconTest {
         assertEquals(0.0f, b1.getRecCrystalCorrectionFine(), 0.0001);
         assertEquals(0.99f, b1.getRecInputNoise(), 0.0001);
 
+        recBeacon = "Gladbck>APRS,TCPIP*,qAC,GLIDERN2:/095759h5133.28NI00659.55E&/A=000154 v0.1.3 CPU:0.1 RAM:287.6/458.6MB NTP:0.3ms/-10.0ppm +40.1C RF:+53+1.0ppm";
+        b1 = new AprsReceiverBeacon(recBeacon);
+        assertNotNull(b1);
+        assertEquals(53, b1.getRecCrystalCorrection());
+        assertEquals(1.0f, b1.getRecCrystalCorrectionFine(), 0.0001);
+        assertEquals(0.0f, b1.getRecInputNoise(), 0.0001);
+
     }
 
     @Test
