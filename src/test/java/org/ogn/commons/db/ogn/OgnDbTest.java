@@ -7,7 +7,6 @@ package org.ogn.commons.db.ogn;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
@@ -19,9 +18,9 @@ import org.ogn.commons.utils.JsonUtils;
 public class OgnDbTest {
 
     @Test
-    public void testWithRemoteDb() throws Exception {
+    public void test1() throws Exception {
 
-        final OgnDb ogndb = new OgnDb();
+        final OgnDb ogndb = new OgnDb("src/test/resources/ogn-ddb.txt");
         ogndb.reload();
 
         AircraftDescriptor desc = ogndb.getDescriptor(null);
@@ -59,14 +58,14 @@ public class OgnDbTest {
 
         for (int i = 0; i < 5; i++) {
 
-            desc = ogndb.getDescriptor("48497C"); // ICAO address
+            desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
             System.out.println(JsonUtils.toJson(desc));
             assertNotNull(desc);
 
-            desc = ogndb.getDescriptor("48497C"); // ICAO address
+            desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
             System.out.println(JsonUtils.toJson(desc));
             assertNotNull(desc);
-            desc = ogndb.getDescriptor("48497C"); // ICAO address
+            desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
             System.out.println(JsonUtils.toJson(desc));
             assertNotNull(desc);
             Thread.sleep(20 + r.nextInt(50));
@@ -75,14 +74,14 @@ public class OgnDbTest {
             assertNull(desc);
 
             Thread.sleep(20 + r.nextInt(50));
-            desc = ogndb.getDescriptor("48497C"); // ICAO address
+            desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
             System.out.println(JsonUtils.toJson(desc));
             assertNotNull(desc);
 
-            assertEquals("PH-GZC", desc.getRegNumber());
-            assertEquals("PZC", desc.getCN());
+            assertEquals("G-DGIO", desc.getRegNumber());
+            assertEquals("DG1", desc.getCN());
             assertNull(desc.getOwner());
-            assertEquals("Towplane", desc.getModel());
+            assertEquals("DG-100", desc.getModel());
             assertNull(desc.getFreq());
 
             desc = ogndb.getDescriptor("some-not-existing");
@@ -93,32 +92,6 @@ public class OgnDbTest {
 
         t1.join();
         t2.join();
-    }
-
-    @Test
-    public void testCaching() {
-        OgnDb ogndb = new OgnDb();
-        long t1 = System.currentTimeMillis();
-        ogndb.reload();
-        AircraftDescriptor desc = ogndb.getDescriptor("DD83CE"); // FLARM address
-        assertNotNull(desc);
-        System.out.println(JsonUtils.toJson(desc));
-        assertTrue(desc.isKnown());
-        assertEquals("F-CLMT", desc.getRegNumber());
-        long t2 = System.currentTimeMillis();
-        long dt = t2 - t1;
-
-        desc = ogndb.getDescriptor("DD83CE"); // FLARM address
-        desc = ogndb.getDescriptor("DD83CE");
-        desc = ogndb.getDescriptor("DD83CE");
-        desc = ogndb.getDescriptor("DD83CE");
-        assertNotNull(desc);
-        System.out.println(JsonUtils.toJson(desc));
-        assertTrue(desc.isKnown());
-        assertEquals("F-CLMT", desc.getRegNumber());
-        long t3 = System.currentTimeMillis();
-        long dt2 = t3 - t2;
-        assertTrue(dt2 < dt);
     }
 
     @Test
