@@ -262,7 +262,8 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
             }
         }
 
-        if (!unmachedParams.isEmpty()) {                        
+        if (!unmachedParams.isEmpty()) {    
+            System.err.println(String.format("aprs-sentence:[%s] unmatched aprs parms: %s", aprsSentence, unmachedParams));
             LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
         }
     }
