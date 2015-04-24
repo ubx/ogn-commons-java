@@ -88,7 +88,7 @@ public class IgcUtilsTest {
     @Test
     public void test5() {
         expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn("A-BCD");
+        expect(descriptor.getRegNumber()).andReturn("a-bcd");
         expect(descriptor.getCN()).andReturn("");
         expect(beacon.getId()).andReturn("123456");
 
