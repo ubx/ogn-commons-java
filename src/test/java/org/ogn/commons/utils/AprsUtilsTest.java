@@ -28,7 +28,7 @@ public class AprsUtilsTest {
 
         int last = 0;
         for (int i = 0; i < 100; i++) {
-            clientId = AprsUtils.generateClientId();            
+            clientId = AprsUtils.generateClientId();
 
             int n = -1;
             String suffix = null;
@@ -59,8 +59,8 @@ public class AprsUtilsTest {
         double lat = 51.179500000000004;
         double lon = -1.0328333333333335;
         assertEquals(51.1077f, AprsUtils.degToDms(lat), 0.01f);
-        assertEquals(1.0197f, AprsUtils.degToDms(lon), 0.01f);      
-        assertEquals(lat,AprsUtils.dmsToDeg(AprsUtils.degToDms(lat)),1e-10f);
+        assertEquals(1.0197f, AprsUtils.degToDms(lon), 0.01f);
+        assertEquals(lat, AprsUtils.dmsToDeg(AprsUtils.degToDms(lat)), 1e-10f);
     }
 
     @Test
@@ -109,5 +109,30 @@ public class AprsUtilsTest {
         t = AprsUtils.toUtcTimestamp("235959");
         assertEquals(0, t - timestamp);
         assertTrue(t % 1000 == 0);
+    }
+
+    @Test
+    public void testDistance() {
+
+        double lat1 = 43.04283f;
+        double lon1 = 0.55f;
+
+        double lat2 = 43.466f;
+        double lon2 = 0.72f;
+
+        long distMetres = Math.round(AprsUtils.calcDistance(lat1, lon1, lat2, lon2));
+        assertEquals(49027, distMetres);
+
+        double distKm = AprsUtils.calcDistanceInKm(lat1, lon1, lat2, lon2);
+        assertEquals(49.03, distKm, 0.1);
+
+        lat1 = 43.44383f;
+
+        distKm = AprsUtils.calcDistanceInKm(lat1, lon1, lat2, lon2);
+        assertEquals(13.94, distKm, 0.001);
+
+        lon2 = -0.72f;
+        distKm = AprsUtils.calcDistanceInKm(lat1, lon1, lat2, lon2);
+        assertEquals(102.5, distKm, 0.1);
     }
 }

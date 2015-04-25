@@ -4,6 +4,10 @@
 
 package org.ogn.commons.utils;
 
+import static java.lang.Math.acos;
+import static java.lang.Math.cos;
+import static java.lang.Math.round;
+import static java.lang.Math.sin;
 import static java.lang.String.format;
 
 import java.net.InetAddress;
@@ -53,7 +57,7 @@ public class AprsUtils {
 
     public static double dmsToDeg(double dms) {
         double absDms = Math.abs(dms);
-        double d = Math.floor(absDms);       
+        double d = Math.floor(absDms);
         double m = (absDms - d) * 100 / 60;
         return (d + m);
     }
@@ -147,4 +151,30 @@ public class AprsUtils {
     public static float kntToKmh(float knts) {
         return knts * (float) 1.852; // kts to km/h
     }
+
+    /**
+     * computes distance(in m) between two coordinates (in deg. format)
+     * 
+     * @param degLat1
+     * @param degLon1
+     * @param dgLat2
+     * @param degLon2
+     * @return a distance in m
+     */
+    public static double calcDistance(double degLat1, double degLon1, double degLat2, double degLon2) {
+        final int RADIUS = 6371000;
+
+        double radLat1 = degLat1 * Math.PI / 180;
+        double radLon1 = degLon1 * Math.PI / 180;
+
+        double radLat2 = degLat2 * Math.PI / 180;
+        double radLon2 = degLon2 * Math.PI / 180;
+
+        return acos(sin(radLat1) * sin(radLat2) + cos(radLat1) * cos(radLat2) * cos(radLon2 - radLon1)) * RADIUS;
+    }
+
+    public static double calcDistanceInKm(double degLat1, double degLon1, double degLat2, double degLon2) {
+        return round(AprsUtils.calcDistance(degLat1, degLon1, degLat2, degLon2) / 1000 * 100.0) / 100.0;
+    }
+
 }
