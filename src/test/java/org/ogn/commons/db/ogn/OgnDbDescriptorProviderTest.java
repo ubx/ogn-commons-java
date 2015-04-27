@@ -20,7 +20,7 @@ public class OgnDbDescriptorProviderTest {
 
         assertNotNull(provider);
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         AircraftDescriptor desc = provider.findDescriptor("DD83CE");
         assertNotNull(desc);
