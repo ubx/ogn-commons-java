@@ -1,0 +1,11 @@
+org.ogn.commons.beacon
+org.ogn.commons.beacon.descriptor
+org.ogn.commons.beacon.forwarder
+org.ogn.commons.beacon.impl
+org.ogn.commons.beacon.impl.aprs
+org.ogn.commons.collections
+org.ogn.commons.db
+org.ogn.commons.db.flarmnet
+org.ogn.commons.db.ogn
+org.ogn.commons.igc
+org.ogn.commons.utils
