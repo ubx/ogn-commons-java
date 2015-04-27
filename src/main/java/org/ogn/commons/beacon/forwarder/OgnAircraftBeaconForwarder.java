@@ -18,5 +18,5 @@ public interface OgnAircraftBeaconForwarder extends OgnBeaconForwarder {
      * @param beacon and AircraftBeacon
      * @param descriptor static aircraft description
      */
-    void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor);
+    void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon);
 }

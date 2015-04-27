@@ -121,4 +121,20 @@ public class AprsAircraftBeaconTest {
         assertEquals(AddressType.UNRECOGNIZED, b1.getAddressType());
     }
 
+    
+    @Test
+    public void test6() {
+
+        String acBeacon = "FLRDDEAAB>APRS,qAS,Hornberg:/153509h4844.83N/00951.62E'301/001/A=002365 id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
+        AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+
+        assertNotNull(acBeacon);
+        System.out.println(JsonUtils.toJson(b1));
+
+        //assertEquals(AddressType.UNRECOGNIZED, b1.getAddressType());
+    }
+    
+    
+
+    
 }
