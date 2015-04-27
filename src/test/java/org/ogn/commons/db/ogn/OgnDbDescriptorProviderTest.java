@@ -16,11 +16,12 @@ public class OgnDbDescriptorProviderTest {
 
     @Test
     public void test() throws Exception {
-        AircraftDescriptorProvider provider = new FileDbDescriptorProvider<OgnDb>(OgnDb.class);
+        AircraftDescriptorProvider provider = new FileDbDescriptorProvider<OgnDb>(OgnDb.class,
+                "src/test/resources/ogn-ddb.txt", 2000);
 
         assertNotNull(provider);
 
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         AircraftDescriptor desc = provider.findDescriptor("DD83CE");
         assertNotNull(desc);
