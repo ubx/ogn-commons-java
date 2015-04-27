@@ -68,7 +68,7 @@
 					<doctitle>${artifactId}, ${project.version}</doctitle>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-scm-publish-plugin</artifactId>
@@ -78,7 +78,7 @@
 					<checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
 					<content>${project.reporting.outputDirectory}/apidocs</content>
 					<skipDeletedFiles>true</skipDeletedFiles>
-					<pubScmUrl>scm:git:git@github.com:glidernet/ogn-commons-java.git</pubScmUrl>
+					<pubScmUrl>scm:git:https://github.com/glidernet/${project.artifactId}</pubScmUrl>
 					<scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
 				</configuration>
 			</plugin>
