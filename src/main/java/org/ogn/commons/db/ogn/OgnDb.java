@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles OGN db.
+ * This class handles OGN ddb.
  * 
  * @author wbuczak
  */

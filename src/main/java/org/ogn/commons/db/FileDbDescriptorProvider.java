@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This AircraftDescriptorProvider resolves AircraftDescriptors from OGN db. It can be configured to refresh its
- * internal cache periodically.
+ * A FileDbDescriptorProvider is a type of <code>AircraftDescriptorProvider</code> which resolves AircraftDescriptors
+ * from file-based databases (e.g. OGN ddb). It can be configured to refresh its internal cache periodically.
  * 
  * @author wbuczak
  */
