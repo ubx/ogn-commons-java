@@ -106,7 +106,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
     // id06DF03B3 -019fpm +0.0rot 39.0dB 0e -6.7kHz gps1x2 hear0CC5 hearABA7
 
     private static final Pattern basicAprsPattern = Pattern
-            .compile("(.+)>.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*");
+            .compile("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
 
     private static final Pattern addressPattern = Pattern.compile("id(\\S{8})");
     private static final Pattern climbRatePattern = Pattern.compile("(\\+|\\-)(\\d+)fpm");
@@ -201,7 +201,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
         Matcher matcher;
 
         List<String> unmachedParams = new ArrayList<>();
-        
+
         // remember raw packet string
         rawPacket = aprsSentence;
 
@@ -262,8 +262,9 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
             }
         }
 
-        if (!unmachedParams.isEmpty()) {    
-            System.err.println(String.format("aprs-sentence:[%s] unmatched aprs parms: %s", aprsSentence, unmachedParams));
+        if (!unmachedParams.isEmpty()) {
+            System.err.println(String.format("aprs-sentence:[%s] unmatched aprs parms: %s", aprsSentence,
+                    unmachedParams));
             LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
         }
     }

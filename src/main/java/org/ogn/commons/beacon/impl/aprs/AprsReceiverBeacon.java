@@ -88,7 +88,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
     // RF:+127-2.9ppm/+4.3dB
 
     private static final Pattern basicAprsPattern = Pattern
-            .compile("(.+)>.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W)./A=(\\d{6}).*");
+            .compile("(.+?)>.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W)./A=(\\d{6}).*?");
 
     private static final Pattern versionPattern = Pattern.compile("v(\\d+\\.\\d+\\.\\d+)");
     private static final Pattern cpuPattern = Pattern.compile("CPU:(\\d+\\.\\d+)");
