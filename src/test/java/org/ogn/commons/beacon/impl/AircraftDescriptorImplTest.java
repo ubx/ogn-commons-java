@@ -31,6 +31,8 @@ public class AircraftDescriptorImplTest {
         assertEquals("129.975", d1.getFreq());
         assertTrue(d1.isTracked());
         assertTrue(d1.isIdentified());
+        
+        System.out.println(JsonUtils.toJson(d1));
     }
 
     @Test
