@@ -49,7 +49,12 @@ public class AprsUtils {
     public static String generateClientId() {
         try {
             String suffix = UUID.randomUUID().toString().split("-")[3].toUpperCase();
-            return InetAddress.getLocalHost().getHostName().substring(0, 3).toUpperCase() + "-" + suffix;
+            String res = InetAddress.getLocalHost().getHostName().substring(0, 3).toUpperCase();
+            StringBuilder bld = new StringBuilder(res.replace("-", ""));
+            bld.append("-");
+            bld.append(suffix);
+
+            return bld.toString();
         } catch (UnknownHostException e) {
             return null;
         }

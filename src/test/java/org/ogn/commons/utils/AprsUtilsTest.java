@@ -34,7 +34,7 @@ public class AprsUtilsTest {
             String suffix = null;
             try {
                 String[] tokens = clientId.split("-");
-                assertEquals(3, tokens[0].length());
+                assertEquals(2, tokens.length);
 
                 n = Integer.parseInt(tokens[1], 16);
                 if (last != 0) {
