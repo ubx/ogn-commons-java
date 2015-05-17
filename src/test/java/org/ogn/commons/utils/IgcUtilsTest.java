@@ -99,4 +99,19 @@ public class IgcUtilsTest {
 
         assertEquals("123456_A-BCD", igcId);
     }
+    
+    @Test
+    public void test6() {
+        expect(descriptor.isKnown()).andReturn(true);
+        expect(descriptor.getRegNumber()).andReturn("?");
+        expect(descriptor.getCN()).andReturn("??");
+        expect(beacon.getId()).andReturn("123456");
+
+        replay(beacon, descriptor);
+
+        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+        verify(beacon, descriptor);
+
+        assertEquals("123456", igcId);
+    }    
 }
