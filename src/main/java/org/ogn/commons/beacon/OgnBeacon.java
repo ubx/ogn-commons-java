@@ -37,6 +37,16 @@ public interface OgnBeacon {
     float getAlt();
     
     /**
+     * deg
+     */
+    int getTrack();
+
+    /**
+     * km/h
+     */
+    float getGroundSpeed();    
+    
+    /**
      * 
      * @return raw (un-decoded) string representation of a packet
      */

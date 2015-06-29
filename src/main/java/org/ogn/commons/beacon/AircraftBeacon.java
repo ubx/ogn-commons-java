@@ -11,16 +11,6 @@ public interface AircraftBeacon extends OgnBeacon {
     String getReceiverName();
 
     /**
-     * deg
-     */
-    int getTrack();
-
-    /**
-     * km/h
-     */
-    float getGroundSpeed();
-
-    /**
      * id can be either ICAO, FLARM, OGN or RANDOM
      */
     AddressType getAddressType();
