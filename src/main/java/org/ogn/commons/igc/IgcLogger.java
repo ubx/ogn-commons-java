@@ -16,268 +16,311 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.ogn.commons.beacon.AircraftBeacon;
+import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.utils.AprsUtils;
 import org.ogn.commons.utils.AprsUtils.Coordinate;
+import org.ogn.commons.utils.IgcUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The IGC logger creates and writes to IGC files. The logger's log() operation is non-blocking (logs are written to a
- * file by a background thread)
+ * The IGC logger creates and writes to IGC files. The logger's log() operation
+ * is non-blocking (logs are written to a file by a background thread)
  * 
  * @author Seb, wbuczak
  */
 public class IgcLogger {
 
-    public static enum Mode {
-        ASYNC,
-        SYNC
-    }
+	public static enum Mode {
+		ASYNC, SYNC
+	}
 
-    private static final Logger LOG = LoggerFactory.getLogger(IgcLogger.class);
+	private static final Logger LOG = LoggerFactory.getLogger(IgcLogger.class);
 
-    private static final String DEFAULT_IGC_BASE_DIR = "log";
+	private static final String DEFAULT_IGC_BASE_DIR = "log";
 
-    private String igcBaseDir;
+	private String igcBaseDir;
 
-    private static final String LINE_SEP = System.lineSeparator();
+	private static final String LINE_SEP = System.lineSeparator();
 
-    private Mode workingMode;
+	private Mode workingMode;
 
-    private BlockingQueue<LogRecord> logRecords;
-    private volatile Future<?> pollerFuture;
-    private ExecutorService executor;
+	private BlockingQueue<LogRecord> logRecords;
+	private volatile Future<?> pollerFuture;
+	private ExecutorService executor;
 
-    private static class LogRecord {
-        String immat;
-        double lat;
-        double lon;
-        float alt;
-        String comment;
+	private static class LogRecord {
+		AircraftBeacon beacon;
+		AircraftDescriptor descriptor;
 
-        LogRecord(String immat, double lat, double lon, float alt, String comment) {
-            this.immat = immat;
-            this.lat = lat;
-            this.lon = lon;
-            this.alt = alt;
-            this.comment = comment;
-        }
-    }
+		LogRecord(final AircraftBeacon beacon,
+				final AircraftDescriptor descriptor) {
+			this.beacon = beacon;
+			this.descriptor = descriptor;
+		}
+	}
 
-    private class PollerTask implements Runnable {
-        private Logger PLOG = LoggerFactory.getLogger(PollerTask.class);
+	private class PollerTask implements Runnable {
+		private Logger PLOG = LoggerFactory.getLogger(PollerTask.class);
 
-        @Override
-        public void run() {
-            PLOG.trace("starting...");
-            LogRecord record = null;
-            while (!Thread.interrupted()) {
-                try {
-                    record = logRecords.take();
-                    logToIgcFile(record.immat, record.lat, record.lon, record.alt, record.comment);
-                } catch (InterruptedException e) {
-                    PLOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
-                    Thread.currentThread().interrupt();
-                    continue;
-                }
-            }// while
-            PLOG.trace("exiting..");
-        }
-    }
+		@Override
+		public void run() {
+			PLOG.trace("starting...");
+			LogRecord record = null;
+			while (!Thread.interrupted()) {
+				try {
+					record = logRecords.take();
+					logToIgcFile(record.beacon, record.descriptor);
+				} catch (InterruptedException e) {
+					PLOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
+					Thread.currentThread().interrupt();
+					continue;
+				}
+			}// while
+			PLOG.trace("exiting..");
+		}
+	}
 
-    public IgcLogger(Mode mode) {
-        this(DEFAULT_IGC_BASE_DIR, mode);
-    }
+	public IgcLogger(Mode mode) {
+		this(DEFAULT_IGC_BASE_DIR, mode);
+	}
 
-    public IgcLogger(final String logsFolder, Mode mode) {
-        LOG.info("creating igc logger [log-folder: {}, mode: {}]",logsFolder,mode);
-        igcBaseDir = logsFolder;
-        workingMode = mode;
+	public IgcLogger(final String logsFolder, Mode mode) {
+		LOG.info("creating igc logger [log-folder: {}, mode: {}]", logsFolder,
+				mode);
+		igcBaseDir = logsFolder;
+		workingMode = mode;
 
-        if (workingMode == Mode.ASYNC) {
-            logRecords = new LinkedBlockingQueue<>();
-            executor = Executors.newSingleThreadExecutor();
-            pollerFuture = executor.submit(new PollerTask());
-        }
-    }
+		if (workingMode == Mode.ASYNC) {
+			logRecords = new LinkedBlockingQueue<>();
+			executor = Executors.newSingleThreadExecutor();
+			pollerFuture = executor.submit(new PollerTask());
+		}
+	}
 
-    public IgcLogger() {
-        this(DEFAULT_IGC_BASE_DIR, Mode.ASYNC);
-    }
+	public IgcLogger() {
+		this(DEFAULT_IGC_BASE_DIR, Mode.ASYNC);
+	}
 
-    public IgcLogger(final String logsFolder) {
-        this(logsFolder, Mode.ASYNC);
-    }
+	public IgcLogger(final String logsFolder) {
+		this(logsFolder, Mode.ASYNC);
+	}
 
-    private void writeIgcHeader(FileWriter igcFile, Calendar calendar, String immat) {
-        // Write IGC file header
-        StringBuilder bld = new StringBuilder();
-        try {
-            bld.append("AGNE001Glider network gateway").append(LINE_SEP);
-            bld.append("HFDTE").append(String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)))
-                    .append(String.format("%02d", calendar.get(Calendar.MONTH) + 1))
-                    .append(String.format("%04d", calendar.get(Calendar.YEAR)).substring(2)) // last 2 chars of the year
-                    .append(LINE_SEP);
+	private void writeIgcHeader(FileWriter igcFile, Calendar calendar,
+			AircraftDescriptor descriptor) {
 
-            igcFile.write(bld.toString());
+		// Write IGC file header
+		StringBuilder bld = new StringBuilder();
+		try {
+			bld.append("AGNE001 OGN gateway").append(LINE_SEP);
+			bld.append("HFDTE")
+					.append(String.format("%02d",
+							calendar.get(Calendar.DAY_OF_MONTH)))
+					.append(String.format("%02d",
+							calendar.get(Calendar.MONTH) + 1))
+					.append(String.format("%04d", calendar.get(Calendar.YEAR))
+							.substring(2))
+					// last 2 chars of the year
+					.append(LINE_SEP).append("HFGIDGLIDERID:")
+					.append(descriptor.getRegNumber()).append(LINE_SEP)
+					.append("HFGTYGLIDERTYPE:").append(descriptor.getModel())
+					.append(LINE_SEP).append("HFCIDCOMPETITIONID:")
+					.append(descriptor.getCN()).append(LINE_SEP);
 
-        } catch (IOException e) {
-            LOG.error("exception caught", e);
-        }
-    }
+			igcFile.write(bld.toString());
 
-    private void logToIgcFile(String immat, double lat, double lon, float alt, String comment) {
-        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-        calendar.setTimeInMillis(System.currentTimeMillis());
+		} catch (IOException e) {
+			LOG.error("exception caught", e);
+		}
+	}
 
-        String dateString = new String(String.format("%04d", calendar.get(Calendar.YEAR)) + "-"
-                + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-"
-                + String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
+	private void logToIgcFile(final AircraftBeacon beacon,
+			final AircraftDescriptor descriptor) {
 
-        // Generate filename from date and immat
-        String igcFileName = new String(dateString + "_" + immat + ".IGC");
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
 
-        File theDir = new File(igcBaseDir);
-        if (!theDir.exists()) {
-            // if directory doesn't exist create it
-            if (!theDir.mkdir()) {
-                LOG.warn("the directory {} could not be created", theDir);
-                return;
-            }
-        }
+		Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+		calendar.setTimeInMillis(System.currentTimeMillis());
 
-        File subDir = new File(igcBaseDir + File.separatorChar + dateString);
-        if (!subDir.exists()) {
-            // if directory doesn't exist create it
-            if (!subDir.mkdir()) {
-                LOG.warn("the directory {} could not be created", subDir);
-                return;
-            }
-        }
+		String dateString = new String(String.format("%04d",
+				calendar.get(Calendar.YEAR))
+				+ "-"
+				+ String.format("%02d", calendar.get(Calendar.MONTH) + 1)
+				+ "-"
+				+ String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
 
-        String filePath = igcBaseDir + File.separatorChar + dateString + File.separatorChar + igcFileName;
+		// Generate filename from date and immat
+		String igcFileName = new String(dateString + "_" + igcId + ".IGC");
 
-        // Check if the IGC file already exist
-        File f = new File(filePath);
+		File theDir = new File(igcBaseDir);
+		if (!theDir.exists()) {
+			// if directory doesn't exist create it
+			if (!theDir.mkdir()) {
+				LOG.warn("the directory {} could not be created", theDir);
+				return;
+			}
+		}
 
-        FileWriter igcFile = null;
-        // create (if not exists) and/or open the file
-        try {
-            igcFile = new FileWriter(filePath, true);
-        } catch (IOException ex) {
-            LOG.error("exception caught", ex);
-            return; // no point in continuing - file could not be created
-        }
+		File subDir = new File(igcBaseDir + File.separatorChar + dateString);
+		if (!subDir.exists()) {
+			// if directory doesn't exist create it
+			if (!subDir.mkdir()) {
+				LOG.warn("the directory {} could not be created", subDir);
+				return;
+			}
+		}
 
-        // if this is a brand new file - write the header
-        if (!f.exists()) {
-            // write the igc header
-            writeIgcHeader(igcFile, calendar, immat);
-        }
+		String filePath = igcBaseDir + File.separatorChar + dateString
+				+ File.separatorChar + igcFileName;
 
-        // Add fix
-        try {
+		// Check if the IGC file already exist
+		File f = new File(filePath);
 
-            StringBuilder bld = new StringBuilder();
+		boolean writeHeader = false;
+		if (!f.exists())
+			// if this is a brand new file - write the header
+			writeHeader = true;
 
-            if (comment != null) {
-                // log original APRS sentence to IGC file for debug, SAR & co
-                bld.append("LGNE ").append(comment).append(LINE_SEP);
-            }
+		FileWriter igcFile = null;
+		// create (if not exists) and/or open the file
+		try {
+			igcFile = new FileWriter(filePath, true);
+		} catch (IOException ex) {
+			LOG.error("exception caught", ex);
+			return; // no point to continue - file could not be created
+		}
 
-            bld.append("B").append(String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY)))
-                    .append(String.format("%02d", calendar.get(Calendar.MINUTE)))
-                    .append(String.format("%02d", calendar.get(Calendar.SECOND)))
-                    .append(AprsUtils.degToIgc(lat, Coordinate.LAT)).append(AprsUtils.degToIgc(lon, Coordinate.LON))
-                    .append("A") // A for 3D fix (and not 2D)
-                    .append("00000") // baro. altitude (but it is false as we have only GPS altitude
-                    .append(String.format("%05.0f", alt)) // GPS altitude
-                    .append(LINE_SEP);
+		// if this is a brand new file - write the header
+		if (writeHeader) {
+			// write the igc header
+			writeIgcHeader(igcFile, calendar, descriptor);
+		}
 
-            igcFile.write(bld.toString());
+		// Add fix
+		try {
 
-        } catch (IOException e) {
-            LOG.error("exception caught", e);
-        } finally {
-            try {
-                igcFile.close();
-            } catch (Exception ex) {
-                LOG.warn("could not close igc file", ex);
-            }
-        }
-    }
+			StringBuilder bld = new StringBuilder();
 
-    public void log(String immat, double lat, double lon, float alt) {
-        log(immat, lat, lon, alt, null);
-    }
+			// log original APRS sentence to IGC file for debug, SAR & co
+			bld.append("LGNE ").append(beacon.getRawPacket()).append(LINE_SEP);
 
-    /**
-     * @param immat aircraft registration (if known) or unique tracker/flarm id
-     * @param lat latitude
-     * @param lon longitude
-     * @param alt altitude
-     * @param comment a string which will fall into the igc file as a comment (e.g. aprs sentence can be logged for
-     *            debugging purposes)
-     */
-    public void log(String immat, double lat, double lon, float alt, String comment) {
-        switch (workingMode) {
+			bld.append("B")
+					.append(String.format("%02d",
+							calendar.get(Calendar.HOUR_OF_DAY)))
+					.append(String.format("%02d", calendar.get(Calendar.MINUTE)))
+					.append(String.format("%02d", calendar.get(Calendar.SECOND)))
+					.append(AprsUtils.degToIgc(beacon.getLat(), Coordinate.LAT))
+					.append(AprsUtils.degToIgc(beacon.getLon(), Coordinate.LON))
+					.append("A") // A for 3D fix (and not 2D)
+					.append("00000") // baro. altitude (but it is false as we
+										// have only GPS altitude
+					.append(String.format("%05.0f", beacon.getAlt())) // GPS
+																		// altitude
 
-        case ASYNC:
-            if (!logRecords.offer(new LogRecord(immat, lat, lon, alt, comment))) {
-                LOG.warn("could not insert LogRecord to the igc logging queue");
-            }
-            break;
+					.append(LINE_SEP);
 
-        default:
-            logToIgcFile(immat, lat, lon, alt, comment);
-        }
+			igcFile.write(bld.toString());
 
-    }
+		} catch (IOException e) {
+			LOG.error("exception caught", e);
+		} finally {
+			try {
+				igcFile.close();
+			} catch (Exception ex) {
+				LOG.warn("could not close igc file", ex);
+			}
+		}
+	}
 
-    /**
-     * can be used to stop the poller thread. only affects IgcLogger in ASYNC mode
-     */
-    public void stop() {
-        if (pollerFuture != null) {
-            pollerFuture.cancel(false);
-        }
-    }
+	/**
+	 * @param immat
+	 *            aircraft registration (if known) or unique tracker/flarm id
+	 * @param lat
+	 *            latitude
+	 * @param lon
+	 *            longitude
+	 * @param alt
+	 *            altitude
+	 * @param comment
+	 *            a string which will fall into the igc file as a comment (e.g.
+	 *            aprs sentence can be logged for debugging purposes)
+	 */
+	public void log(final AircraftBeacon beacon,
+			final AircraftDescriptor descriptor) {
+		switch (workingMode) {
+
+		case ASYNC:
+			if (!logRecords.offer(new LogRecord(beacon, descriptor))) {
+				LOG.warn("could not insert LogRecord to the igc logging queue");
+			}
+			break;
+
+		default:
+			logToIgcFile(beacon, descriptor);
+		}
+
+	}
+
+	/**
+	 * can be used to stop the poller thread. only affects IgcLogger in ASYNC
+	 * mode
+	 */
+	public void stop() {
+		if (pollerFuture != null) {
+			pollerFuture.cancel(false);
+		}
+	}
 }
 
 /*
- * From IGC spec (http://www.fai.org/gnss-recording-devices/igc-approved-flight-recorders):
+ * From IGC spec
+ * (http://www.fai.org/gnss-recording-devices/igc-approved-flight-recorders):
  * 
- * Altitude - Metres, separate records for GNSS and pressure altitudes. Date (of the first line in the B record) - UTC
- * DDMMYY (day, month, year). Latitude and Longitude - Degrees, minutes and decimal minutes to three decimal places,
- * with N,S,E,W designators Time - UTC, for source, see para 3.4 in the main body in this document. Note that UTC is not
- * the same as the internal system time in the U.S. GPS system, see under "GPS system time" in the Glossary.
+ * Altitude - Metres, separate records for GNSS and pressure altitudes. Date (of
+ * the first line in the B record) - UTC DDMMYY (day, month, year). Latitude and
+ * Longitude - Degrees, minutes and decimal minutes to three decimal places,
+ * with N,S,E,W designators Time - UTC, for source, see para 3.4 in the main
+ * body in this document. Note that UTC is not the same as the internal system
+ * time in the U.S. GPS system, see under "GPS system time" in the Glossary.
  * 
  * ---
  * 
- * Altitude - AAAAAaaa AAAAA - fixed to 5 digits with leading 0 aaa - where used, the number of altitude decimals (the
- * number of fields recorded are those available for altitude in the Record concerned, less fields already used for
- * AAAAA) Altitude, GNSS. Where GNSS altitude is not available from GNSS position-lines such as in the case of a 2D fix
- * (altitude drop-out), it shall be recorded in the IGC format file as zero so that the lack of valid GNSS altitude can
- * be clearly seen during post-flight analysis.
+ * Altitude - AAAAAaaa AAAAA - fixed to 5 digits with leading 0 aaa - where
+ * used, the number of altitude decimals (the number of fields recorded are
+ * those available for altitude in the Record concerned, less fields already
+ * used for AAAAA) Altitude, GNSS. Where GNSS altitude is not available from
+ * GNSS position-lines such as in the case of a 2D fix (altitude drop-out), it
+ * shall be recorded in the IGC format file as zero so that the lack of valid
+ * GNSS altitude can be clearly seen during post-flight analysis.
  * 
- * Date - DDMMYY DD - number of the day in the month, fixed to 2 digits with leading 0 where necessary MM - number of
- * the month in year, fixed to 2 digits with leading 0 where necessary YY - number of the year, fixed to 2 digits with
- * leading 0 where necessary
+ * Date - DDMMYY DD - number of the day in the month, fixed to 2 digits with
+ * leading 0 where necessary MM - number of the month in year, fixed to 2 digits
+ * with leading 0 where necessary YY - number of the year, fixed to 2 digits
+ * with leading 0 where necessary
  * 
- * Lat/Long - D D M M m m m N D D D M M m m m E DD - Latitude degrees with leading 0 where necessary DDD - Longitude
- * degrees with leading 0 or 00 where necessary MMmmmNSEW - Lat/Long minutes with leading 0 where necessary, 3 decimal
- * places of minutes (mandatory, not optional), followed by North, South, East or West letter as appropriate
+ * Lat/Long - D D M M m m m N D D D M M m m m E DD - Latitude degrees with
+ * leading 0 where necessary DDD - Longitude degrees with leading 0 or 00 where
+ * necessary MMmmmNSEW - Lat/Long minutes with leading 0 where necessary, 3
+ * decimal places of minutes (mandatory, not optional), followed by North,
+ * South, East or West letter as appropriate
  * 
- * Time - HHMMSS (UTC) - for optional decimal seconds see "s" below HH - Hours fixed to 2 digits with leading 0 where
- * necessary MM - Minutes fixed to 2 digits with leading 0 where necessary SS - Seconds fixed to 2 digits with leading 0
- * where necessary s - number of decimal seconds (if used), placed after seconds (SS above). If the recorder uses fix
- * intervals of less than one second, the extra number(s) are added in the B-record line, their position on the line
- * being identified in the I-record under the Three Letter Code TDS (Time Decimal Seconds, see the codes in para A7).
- * One number "s" indicates tenths of seconds and "ss" is tenths and hundredths, and so forth. If tenths are used at,
- * for instance, character number 49 in the B-record (after other codes such as FXA, SIU, ENL), this is indicated in the
- * I record as: "4949TDS".
+ * Time - HHMMSS (UTC) - for optional decimal seconds see "s" below HH - Hours
+ * fixed to 2 digits with leading 0 where necessary MM - Minutes fixed to 2
+ * digits with leading 0 where necessary SS - Seconds fixed to 2 digits with
+ * leading 0 where necessary s - number of decimal seconds (if used), placed
+ * after seconds (SS above). If the recorder uses fix intervals of less than one
+ * second, the extra number(s) are added in the B-record line, their position on
+ * the line being identified in the I-record under the Three Letter Code TDS
+ * (Time Decimal Seconds, see the codes in para A7). One number "s" indicates
+ * tenths of seconds and "ss" is tenths and hundredths, and so forth. If tenths
+ * are used at, for instance, character number 49 in the B-record (after other
+ * codes such as FXA, SIU, ENL), this is indicated in the I record as:
+ * "4949TDS".
  * 
- * B HHMMSS DDMMmmmN DDDMMmmmE V PPPPP GGGGG CR LF B 130353 4344108N 00547165E A 00275 00275 4533.12N 00559.93E
+ * B HHMMSS DDMMmmmN DDDMMmmmE V PPPPP GGGGG CR LF B 130353 4344108N 00547165E A
+ * 00275 00275 4533.12N 00559.93E
  * 
- * Condor example: HFDTE140713 HFGIDGLIDERID:F-SEB B1303534344108N00547165EA0027500275
+ * Condor example: HFDTE140713 HFGIDGLIDERID:F-SEB
+ * B1303534344108N00547165EA0027500275
  */

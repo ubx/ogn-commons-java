@@ -19,99 +19,113 @@ import org.ogn.commons.beacon.AircraftDescriptor;
 @RunWith(EasyMockRunner.class)
 public class IgcUtilsTest {
 
-    @Mock
-    AircraftDescriptor descriptor;
+	@Mock
+	AircraftDescriptor descriptor;
 
-    @Mock
-    AircraftBeacon beacon;
+	@Mock
+	AircraftBeacon beacon;
 
-    @Test
-    public void test1() {
-        expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn("A-BCD");
-        expect(descriptor.getCN()).andReturn("XY");
-        expect(beacon.getId()).andReturn("123456");
+	@Test
+	public void test1() {
+		expect(descriptor.isKnown()).andReturn(true);
+		expect(descriptor.getRegNumber()).andReturn("A-BCD");
+		expect(descriptor.getCN()).andReturn("XY");
+		expect(beacon.getId()).andReturn("123456");
 
-        replay(beacon, descriptor);
+		replay(beacon, descriptor);
 
-        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
-        verify(beacon, descriptor);
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
 
-        assertEquals("123456_A-BCD_XY", igcId);
-    }
+		assertEquals("123456_A-BCD_XY", igcId);
+	}
 
-    @Test
-    public void test2() {
-        expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn("A-BCD");
-        expect(descriptor.getCN()).andReturn(null);
-        expect(beacon.getId()).andReturn("123456");
+	@Test
+	public void test2() {
+		expect(descriptor.isKnown()).andReturn(true);
+		expect(descriptor.getRegNumber()).andReturn("A-BCD");
+		expect(descriptor.getCN()).andReturn(null);
+		expect(beacon.getId()).andReturn("123456");
 
-        replay(beacon, descriptor);
+		replay(beacon, descriptor);
 
-        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
-        verify(beacon, descriptor);
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
 
-        assertEquals("123456_A-BCD", igcId);
-    }
+		assertEquals("123456_A-BCD", igcId);
+	}
 
-    @Test
-    public void test3() {
-        expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn(null);
-        expect(descriptor.getCN()).andReturn("XY");
-        expect(beacon.getId()).andReturn("123456");
+	@Test
+	public void test3() {
+		expect(descriptor.isKnown()).andReturn(true);
+		expect(descriptor.getRegNumber()).andReturn(null);
+		expect(descriptor.getCN()).andReturn("XY");
+		expect(beacon.getId()).andReturn("123456");
 
-        replay(beacon, descriptor);
+		replay(beacon, descriptor);
 
-        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
-        verify(beacon, descriptor);
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
 
-        assertEquals("123456_XY", igcId);
-    }
+		assertEquals("123456_XY", igcId);
+	}
 
-    @Test
-    public void test4() {
-        expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn("");
-        expect(descriptor.getCN()).andReturn("XY");
-        expect(beacon.getId()).andReturn("123456");
+	@Test
+	public void test4() {
+		expect(descriptor.isKnown()).andReturn(true);
+		expect(descriptor.getRegNumber()).andReturn("");
+		expect(descriptor.getCN()).andReturn("XY");
+		expect(beacon.getId()).andReturn("123456");
 
-        replay(beacon, descriptor);
+		replay(beacon, descriptor);
 
-        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
-        verify(beacon, descriptor);
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
 
-        assertEquals("123456_XY", igcId);
-    }
+		assertEquals("123456_XY", igcId);
+	}
 
-    @Test
-    public void test5() {
-        expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn("a-bcd");
-        expect(descriptor.getCN()).andReturn("");
-        expect(beacon.getId()).andReturn("123456");
+	@Test
+	public void test5() {
+		expect(descriptor.isKnown()).andReturn(true);
+		expect(descriptor.getRegNumber()).andReturn("a-bcd");
+		expect(descriptor.getCN()).andReturn("");
+		expect(beacon.getId()).andReturn("123456");
 
-        replay(beacon, descriptor);
+		replay(beacon, descriptor);
 
-        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
-        verify(beacon, descriptor);
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
 
-        assertEquals("123456_A-BCD", igcId);
-    }
-    
-    @Test
-    public void test6() {
-        expect(descriptor.isKnown()).andReturn(true);
-        expect(descriptor.getRegNumber()).andReturn("?");
-        expect(descriptor.getCN()).andReturn("??");
-        expect(beacon.getId()).andReturn("123456");
+		assertEquals("123456_A-BCD", igcId);
+	}
 
-        replay(beacon, descriptor);
+	@Test
+	public void test6() {
+		expect(descriptor.isKnown()).andReturn(true);
+		expect(descriptor.getRegNumber()).andReturn("?");
+		expect(descriptor.getCN()).andReturn("??");
+		expect(beacon.getId()).andReturn("123456");
 
-        String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
-        verify(beacon, descriptor);
+		replay(beacon, descriptor);
 
-        assertEquals("123456", igcId);
-    }    
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
+
+		assertEquals("123456", igcId);
+	}
+
+	@Test
+	public void test7() {
+		expect(descriptor.isKnown()).andReturn(false);
+		expect(beacon.getId()).andReturn("123456");
+
+		replay(beacon, descriptor);
+
+		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		verify(beacon, descriptor);
+
+		assertEquals("123456", igcId);
+	}
+
 }
