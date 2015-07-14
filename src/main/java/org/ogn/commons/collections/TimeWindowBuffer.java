@@ -23,8 +23,6 @@ import java.util.TimerTask;
 public class TimeWindowBuffer<T> extends ArrayList<T> {
 
 	private static final long serialVersionUID = -8204258873338667741L;
-	private int strLen;
-
 	private final int maxSize;
 	private final long timeWindow;
 	private final String delimiter;
@@ -65,7 +63,6 @@ public class TimeWindowBuffer<T> extends ArrayList<T> {
 					}
 					// clear the buffer
 					this.clear();
-					strLen = 0;
 				}// sync
 		}// sync
 	}
