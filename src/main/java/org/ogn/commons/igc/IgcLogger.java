@@ -54,8 +54,7 @@ public class IgcLogger {
 		AircraftBeacon beacon;
 		AircraftDescriptor descriptor;
 
-		LogRecord(final AircraftBeacon beacon,
-				final AircraftDescriptor descriptor) {
+		LogRecord(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
 			this.beacon = beacon;
 			this.descriptor = descriptor;
 		}
@@ -87,8 +86,7 @@ public class IgcLogger {
 	}
 
 	public IgcLogger(final String logsFolder, Mode mode) {
-		LOG.info("creating igc logger [log-folder: {}, mode: {}]", logsFolder,
-				mode);
+		LOG.info("creating igc logger [log-folder: {}, mode: {}]", logsFolder, mode);
 		igcBaseDir = logsFolder;
 		workingMode = mode;
 
@@ -107,26 +105,25 @@ public class IgcLogger {
 		this(logsFolder, Mode.ASYNC);
 	}
 
-	private void writeIgcHeader(FileWriter igcFile, Calendar calendar,
-			AircraftDescriptor descriptor) {
+	private void writeIgcHeader(FileWriter igcFile, Calendar calendar, AircraftDescriptor descriptor) {
 
 		// Write IGC file header
 		StringBuilder bld = new StringBuilder();
 		try {
 			bld.append("AGNE001 OGN gateway").append(LINE_SEP);
-			bld.append("HFDTE")
-					.append(String.format("%02d",
-							calendar.get(Calendar.DAY_OF_MONTH)))
-					.append(String.format("%02d",
-							calendar.get(Calendar.MONTH) + 1))
-					.append(String.format("%04d", calendar.get(Calendar.YEAR))
-							.substring(2))
-					// last 2 chars of the year
-					.append(LINE_SEP).append("HFGIDGLIDERID:")
-					.append(descriptor.getRegNumber()).append(LINE_SEP)
-					.append("HFGTYGLIDERTYPE:").append(descriptor.getModel())
-					.append(LINE_SEP).append("HFCIDCOMPETITIONID:")
-					.append(descriptor.getCN()).append(LINE_SEP);
+			bld.append("HFDTE").append(String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)))
+					.append(String.format("%02d", calendar.get(Calendar.MONTH) + 1))
+					.append(String.format("%04d", calendar.get(Calendar.YEAR)).substring(2)); // last
+																								// 2
+																								// chars
+																								// of
+																								// the
+																								// year
+
+			if (descriptor != null && descriptor.isKnown())
+				bld.append(LINE_SEP).append("HFGIDGLIDERID:").append(descriptor.getRegNumber()).append(LINE_SEP)
+						.append("HFGTYGLIDERTYPE:").append(descriptor.getModel()).append(LINE_SEP)
+						.append("HFCIDCOMPETITIONID:").append(descriptor.getCN()).append(LINE_SEP);
 
 			igcFile.write(bld.toString());
 
@@ -135,19 +132,15 @@ public class IgcLogger {
 		}
 	}
 
-	private void logToIgcFile(final AircraftBeacon beacon,
-			final AircraftDescriptor descriptor) {
+	private void logToIgcFile(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
 
 		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
 
 		Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		calendar.setTimeInMillis(System.currentTimeMillis());
 
-		String dateString = new String(String.format("%04d",
-				calendar.get(Calendar.YEAR))
-				+ "-"
-				+ String.format("%02d", calendar.get(Calendar.MONTH) + 1)
-				+ "-"
+		String dateString = new String(String.format("%04d", calendar.get(Calendar.YEAR)) + "-"
+				+ String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-"
 				+ String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
 
 		// Generate filename from date and immat
@@ -171,8 +164,7 @@ public class IgcLogger {
 			}
 		}
 
-		String filePath = igcBaseDir + File.separatorChar + dateString
-				+ File.separatorChar + igcFileName;
+		String filePath = igcBaseDir + File.separatorChar + dateString + File.separatorChar + igcFileName;
 
 		// Check if the IGC file already exist
 		File f = new File(filePath);
@@ -205,14 +197,17 @@ public class IgcLogger {
 			// log original APRS sentence to IGC file for debug, SAR & co
 			bld.append("LGNE ").append(beacon.getRawPacket()).append(LINE_SEP);
 
-			bld.append("B")
-					.append(String.format("%02d",
-							calendar.get(Calendar.HOUR_OF_DAY)))
+			bld.append("B").append(String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY)))
 					.append(String.format("%02d", calendar.get(Calendar.MINUTE)))
 					.append(String.format("%02d", calendar.get(Calendar.SECOND)))
 					.append(AprsUtils.degToIgc(beacon.getLat(), Coordinate.LAT))
-					.append(AprsUtils.degToIgc(beacon.getLon(), Coordinate.LON))
-					.append("A") // A for 3D fix (and not 2D)
+					.append(AprsUtils.degToIgc(beacon.getLon(), Coordinate.LON)).append("A") // A
+																								// for
+																								// 3D
+																								// fix
+																								// (and
+																								// not
+																								// 2D)
 					.append("00000") // baro. altitude (but it is false as we
 										// have only GPS altitude
 					.append(String.format("%05.0f", beacon.getAlt())) // GPS
@@ -246,8 +241,7 @@ public class IgcLogger {
 	 *            a string which will fall into the igc file as a comment (e.g.
 	 *            aprs sentence can be logged for debugging purposes)
 	 */
-	public void log(final AircraftBeacon beacon,
-			final AircraftDescriptor descriptor) {
+	public void log(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
 		switch (workingMode) {
 
 		case ASYNC:
