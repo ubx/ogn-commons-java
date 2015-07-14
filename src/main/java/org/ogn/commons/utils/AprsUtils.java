@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import org.ogn.commons.beacon.OgnBeacon;
+
 public class AprsUtils {
 
 	/**
@@ -188,8 +190,16 @@ public class AprsUtils {
 		return acos(sin(radLat1) * sin(radLat2) + cos(radLat1) * cos(radLat2) * cos(radLon2 - radLon1)) * RADIUS;
 	}
 
+	public static double calcDistance(OgnBeacon beacon1, OgnBeacon beacon2) {
+		return calcDistance(beacon1.getLat(), beacon1.getLon(), beacon2.getLat(), beacon2.getLon());
+	}
+
 	public static double calcDistanceInKm(double degLat1, double degLon1, double degLat2, double degLon2) {
 		return round(AprsUtils.calcDistance(degLat1, degLon1, degLat2, degLon2) / 1000 * 100.0) / 100.0;
+	}
+
+	public static double calcDistanceInKm(OgnBeacon beacon1, OgnBeacon beacon2) {
+		return calcDistanceInKm(beacon1.getLat(), beacon1.getLon(), beacon2.getLat(), beacon2.getLon());
 	}
 
 }
