@@ -14,9 +14,11 @@ import org.ogn.commons.beacon.AircraftDescriptor;
  */
 public interface OgnAircraftBeaconForwarder extends OgnBeaconForwarder {
 
-    /**
-     * @param beacon and AircraftBeacon
-     * @param descriptor static aircraft description
-     */
-    void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon);
+	/**
+	 * @param beacon
+	 *            and AircraftBeacon
+	 * @param descriptor
+	 *            static aircraft description
+	 */
+	void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon);
 }

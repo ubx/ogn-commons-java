@@ -21,13 +21,11 @@ import org.ogn.commons.utils.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AprsReceiverBeacon extends OgnBeaconImpl implements
-		ReceiverBeacon, Serializable {
+public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon, Serializable {
 
 	private static final long serialVersionUID = 2851952572220758613L;
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(AprsReceiverBeacon.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AprsReceiverBeacon.class);
 
 	/**
 	 * name of the server receiving the packet
@@ -100,26 +98,19 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements
 	private static final Pattern basicAprsPattern = Pattern
 			.compile("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
 
-	private static final Pattern versionPattern = Pattern
-			.compile("v(\\d+\\.\\d+\\.\\d+)\\.?(.*?)");
+	private static final Pattern versionPattern = Pattern.compile("v(\\d+\\.\\d+\\.\\d+)\\.?(.*?)");
 
-	private static final Pattern cpuPattern = Pattern
-			.compile("CPU:(\\d+\\.\\d+)");
-	private static final Pattern cpuTempPattern = Pattern
-			.compile("(\\+|\\-)(\\d+\\.\\d+)C");
-	private static final Pattern ramPattern = Pattern
-			.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
-	private static final Pattern ntpPattern = Pattern
-			.compile("NTP:(\\d+\\.\\d+)ms/(\\+|\\-)(\\d+\\.\\d+)ppm");
+	private static final Pattern cpuPattern = Pattern.compile("CPU:(\\d+\\.\\d+)");
+	private static final Pattern cpuTempPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)C");
+	private static final Pattern ramPattern = Pattern.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
+	private static final Pattern ntpPattern = Pattern.compile("NTP:(\\d+\\.\\d+)ms/(\\+|\\-)(\\d+\\.\\d+)ppm");
 
 	private static final Pattern rfPatternFull = Pattern
 			.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB");
 
-	private static final Pattern rfPatternLight1 = Pattern
-			.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
+	private static final Pattern rfPatternLight1 = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
 
-	private static final Pattern rfPatternLight2 = Pattern
-			.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm");
+	private static final Pattern rfPatternLight2 = Pattern.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm");
 
 	// Delft>APRS,TCPIP*,qAC,GLIDERN1:/100152h5200.69NI00421.98E&/A=000033
 	// v0.1.3 CPU:0.0 RAM:77.5/458.6MB
@@ -276,8 +267,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements
 		}
 
 		if (!unmachedParams.isEmpty()) {
-			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}",
-					aprsSentence, unmachedParams);
+			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
 		}
 	}
 
@@ -290,8 +280,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements
 		result = prime * result + Float.floatToIntBits(freeRam);
 		result = prime * result + Float.floatToIntBits(ntpError);
 		result = prime * result + recCrystalCorrection;
-		result = prime * result
-				+ Float.floatToIntBits(recCrystalCorrectionFine);
+		result = prime * result + Float.floatToIntBits(recCrystalCorrectionFine);
 		result = prime * result + Float.floatToIntBits(recInputNoise);
 		result = prime * result + Float.floatToIntBits(rtCrystalCorrection);
 		result = prime * result + ((srvName == null) ? 0 : srvName.hashCode());
@@ -308,36 +297,28 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements
 		if (getClass() != obj.getClass())
 			return false;
 		AprsReceiverBeacon other = (AprsReceiverBeacon) obj;
-		if (Float.floatToIntBits(cpuLoad) != Float
-				.floatToIntBits(other.cpuLoad))
+		if (Float.floatToIntBits(cpuLoad) != Float.floatToIntBits(other.cpuLoad))
 			return false;
-		if (Float.floatToIntBits(cpuTemp) != Float
-				.floatToIntBits(other.cpuTemp))
+		if (Float.floatToIntBits(cpuTemp) != Float.floatToIntBits(other.cpuTemp))
 			return false;
-		if (Float.floatToIntBits(freeRam) != Float
-				.floatToIntBits(other.freeRam))
+		if (Float.floatToIntBits(freeRam) != Float.floatToIntBits(other.freeRam))
 			return false;
-		if (Float.floatToIntBits(ntpError) != Float
-				.floatToIntBits(other.ntpError))
+		if (Float.floatToIntBits(ntpError) != Float.floatToIntBits(other.ntpError))
 			return false;
 		if (recCrystalCorrection != other.recCrystalCorrection)
 			return false;
-		if (Float.floatToIntBits(recCrystalCorrectionFine) != Float
-				.floatToIntBits(other.recCrystalCorrectionFine))
+		if (Float.floatToIntBits(recCrystalCorrectionFine) != Float.floatToIntBits(other.recCrystalCorrectionFine))
 			return false;
-		if (Float.floatToIntBits(recInputNoise) != Float
-				.floatToIntBits(other.recInputNoise))
+		if (Float.floatToIntBits(recInputNoise) != Float.floatToIntBits(other.recInputNoise))
 			return false;
-		if (Float.floatToIntBits(rtCrystalCorrection) != Float
-				.floatToIntBits(other.rtCrystalCorrection))
+		if (Float.floatToIntBits(rtCrystalCorrection) != Float.floatToIntBits(other.rtCrystalCorrection))
 			return false;
 		if (srvName == null) {
 			if (other.srvName != null)
 				return false;
 		} else if (!srvName.equals(other.srvName))
 			return false;
-		if (Float.floatToIntBits(totalRam) != Float
-				.floatToIntBits(other.totalRam))
+		if (Float.floatToIntBits(totalRam) != Float.floatToIntBits(other.totalRam))
 			return false;
 		return true;
 	}

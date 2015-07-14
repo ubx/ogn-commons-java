@@ -27,8 +27,7 @@ public class AprsLineParser {
 	private static Pattern rfPattern = Pattern
 			.compile("(.)+ RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB.*");
 
-	private static Pattern cpuPattern = Pattern
-			.compile("(.)+ CPU:(\\d+\\.\\d+).*");
+	private static Pattern cpuPattern = Pattern.compile("(.)+ CPU:(\\d+\\.\\d+).*");
 
 	private static Logger LOG = LoggerFactory.getLogger(AprsLineParser.class);
 
@@ -44,8 +43,7 @@ public class AprsLineParser {
 		return parse(aprsLine, true, true);
 	}
 
-	public OgnBeacon parse(String aprsLine, boolean processAircraftBeacons,
-			boolean processReceiverBeacons) {
+	public OgnBeacon parse(String aprsLine, boolean processAircraftBeacons, boolean processReceiverBeacons) {
 		LOG.trace(aprsLine);
 		OgnBeacon result = null;
 
@@ -56,8 +54,7 @@ public class AprsLineParser {
 
 				// receiver beacons are supposed to have RF and/or CPU
 				// information
-				if (rfPattern.matcher(aprsLine).matches()
-						|| cpuPattern.matcher(aprsLine).matches()) {
+				if (rfPattern.matcher(aprsLine).matches() || cpuPattern.matcher(aprsLine).matches()) {
 
 					if (processReceiverBeacons) {
 						// match receiver beacons

@@ -20,41 +20,41 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class JsonUtils {
 
-    private static ObjectMapper objectMapper;
+	private static ObjectMapper objectMapper;
 
-    private static final Logger LOG = LoggerFactory.getLogger(JsonUtils.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JsonUtils.class);
 
-    private static ObjectMapper getObjectMapper() {
-        if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        }
+	private static ObjectMapper getObjectMapper() {
+		if (objectMapper == null) {
+			objectMapper = new ObjectMapper();
+			objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		}
 
-        return objectMapper;
-    }
+		return objectMapper;
+	}
 
-    public static <T> T fromJson(final String json, Class<T> clazz) {
-        try {
-            return getObjectMapper().readValue(new ByteArrayInputStream(json.getBytes()), clazz);
-        } catch (Exception ex) {
-            LOG.error("deserialization from JSON failed", ex);
-        }
-        return null;
-    }
+	public static <T> T fromJson(final String json, Class<T> clazz) {
+		try {
+			return getObjectMapper().readValue(new ByteArrayInputStream(json.getBytes()), clazz);
+		} catch (Exception ex) {
+			LOG.error("deserialization from JSON failed", ex);
+		}
+		return null;
+	}
 
-    public static String toJson(Object obj) {
-        String result = null;
-  
-        StringWriter str = new StringWriter();
+	public static String toJson(Object obj) {
+		String result = null;
 
-        try {
-            getObjectMapper().writeValue(str, obj);
-            result = str.toString();
-        } catch (Exception ex) {
-            LOG.error("serialization to JSON failed", ex);
-        }
+		StringWriter str = new StringWriter();
 
-        return result;
-    }
+		try {
+			getObjectMapper().writeValue(str, obj);
+			result = str.toString();
+		} catch (Exception ex) {
+			LOG.error("serialization to JSON failed", ex);
+		}
+
+		return result;
+	}
 
 }

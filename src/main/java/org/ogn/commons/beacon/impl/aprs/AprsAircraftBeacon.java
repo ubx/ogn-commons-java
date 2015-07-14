@@ -27,8 +27,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 
 	private static final long serialVersionUID = -7640993719847348787L;
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(AprsAircraftBeacon.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AprsAircraftBeacon.class);
 
 	/**
 	 * Name of the receiver which received this message
@@ -100,21 +99,15 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 			.compile("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
 
 	private static final Pattern addressPattern = Pattern.compile("id(\\S{8})");
-	private static final Pattern climbRatePattern = Pattern
-			.compile("(\\+|\\-)(\\d+)fpm");
-	private static final Pattern turnRatePattern = Pattern
-			.compile("(\\+|\\-)(\\d+\\.\\d+)rot");
-	private static final Pattern signalStrengthPattern = Pattern
-			.compile("(\\d+\\.\\d+)dB");
+	private static final Pattern climbRatePattern = Pattern.compile("(\\+|\\-)(\\d+)fpm");
+	private static final Pattern turnRatePattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)rot");
+	private static final Pattern signalStrengthPattern = Pattern.compile("(\\d+\\.\\d+)dB");
 	private static final Pattern errorCountPattern = Pattern.compile("(\\d+)e");
 
 	// TODO: manage multiple heard ids
-	private static final Pattern hearIDPattern = Pattern
-			.compile("hear(\\w{4})");
-	private static final Pattern frequencyOffsetPattern = Pattern
-			.compile("(\\+|\\-)(\\d+\\.\\d+)kHz");
-	private static final Pattern gpsStatusPattern = Pattern
-			.compile("gps(\\d+x\\d+)");
+	private static final Pattern hearIDPattern = Pattern.compile("hear(\\w{4})");
+	private static final Pattern frequencyOffsetPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)kHz");
+	private static final Pattern gpsStatusPattern = Pattern.compile("gps(\\d+x\\d+)");
 
 	@Override
 	public String getReceiverName() {
@@ -232,14 +225,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				// (see
 				// https://groups.google.com/forum/#!msg/openglidernetwork/lMzl5ZsaCVs/YirmlnkaJOYJ).
 				//
-				addressType = AddressType.forValue(Integer.parseInt(matcher
-						.group(1).substring(0, 2), 16) & 3); // 2
-				aircraftType = AircraftType.forValue((Integer.parseInt(matcher
-						.group(1).substring(0, 2), 16) & 0b1111100) >>> 2);
-				stealth = (Integer.parseInt(matcher.group(1).substring(0, 2),
-						16) & 0b10000000) != 0;
-			} else if ((matcher = climbRatePattern.matcher(aprsParam))
-					.matches()) {
+				addressType = AddressType.forValue(Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 3); // 2
+				aircraftType = AircraftType
+						.forValue((Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b1111100) >>> 2);
+				stealth = (Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b10000000) != 0;
+			} else if ((matcher = climbRatePattern.matcher(aprsParam)).matches()) {
 				climbRate = feetsToMetres(Float.parseFloat(matcher.group(2))) / 60; // feets/m
 																					// to
 																					// m/s
@@ -250,21 +240,17 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				turnRate = Float.parseFloat(matcher.group(2));
 				if (matcher.group(1).equals("-"))
 					turnRate *= -1;
-			} else if ((matcher = signalStrengthPattern.matcher(aprsParam))
-					.matches()) {
+			} else if ((matcher = signalStrengthPattern.matcher(aprsParam)).matches()) {
 				signalStrength = Float.parseFloat(matcher.group(1));
-			} else if ((matcher = errorCountPattern.matcher(aprsParam))
-					.matches()) {
+			} else if ((matcher = errorCountPattern.matcher(aprsParam)).matches()) {
 				errorCount = Integer.parseInt(matcher.group(1));
 			} else if ((matcher = hearIDPattern.matcher(aprsParam)).matches()) {
 				heardAircraftIds.add(matcher.group(1));
-			} else if ((matcher = frequencyOffsetPattern.matcher(aprsParam))
-					.matches()) {
+			} else if ((matcher = frequencyOffsetPattern.matcher(aprsParam)).matches()) {
 				frequencyOffset = Float.parseFloat(matcher.group(2));
 				if (matcher.group(1).equals("-"))
 					frequencyOffset *= -1;
-			} else if ((matcher = gpsStatusPattern.matcher(aprsParam))
-					.matches()) {
+			} else if ((matcher = gpsStatusPattern.matcher(aprsParam)).matches()) {
 				gpsStatus = matcher.group(1);
 			} else {
 				unmachedParams.add(aprsParam);
@@ -272,11 +258,9 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		}
 
 		if (!unmachedParams.isEmpty()) {
-			System.err.println(String.format(
-					"aprs-sentence:[%s] unmatched aprs parms: %s",
-					aprsSentence, unmachedParams));
-			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}",
-					aprsSentence, unmachedParams);
+			System.err.println(String.format("aprs-sentence:[%s] unmatched aprs parms: %s", aprsSentence,
+					unmachedParams));
+			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
 		}
 	}
 
@@ -285,20 +269,14 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
-		result = prime * result
-				+ ((addressType == null) ? 0 : addressType.hashCode());
-		result = prime * result
-				+ ((aircraftType == null) ? 0 : aircraftType.hashCode());
+		result = prime * result + ((addressType == null) ? 0 : addressType.hashCode());
+		result = prime * result + ((aircraftType == null) ? 0 : aircraftType.hashCode());
 		result = prime * result + Float.floatToIntBits(climbRate);
 		result = prime * result + errorCount;
 		result = prime * result + Float.floatToIntBits(frequencyOffset);
-		result = prime * result
-				+ ((gpsStatus == null) ? 0 : gpsStatus.hashCode());
-		result = prime
-				* result
-				+ ((heardAircraftIds == null) ? 0 : heardAircraftIds.hashCode());
-		result = prime * result
-				+ ((receiverName == null) ? 0 : receiverName.hashCode());
+		result = prime * result + ((gpsStatus == null) ? 0 : gpsStatus.hashCode());
+		result = prime * result + ((heardAircraftIds == null) ? 0 : heardAircraftIds.hashCode());
+		result = prime * result + ((receiverName == null) ? 0 : receiverName.hashCode());
 		result = prime * result + Float.floatToIntBits(signalStrength);
 		result = prime * result + (stealth ? 1231 : 1237);
 		result = prime * result + Float.floatToIntBits(turnRate);
@@ -323,13 +301,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 			return false;
 		if (aircraftType != other.aircraftType)
 			return false;
-		if (Float.floatToIntBits(climbRate) != Float
-				.floatToIntBits(other.climbRate))
+		if (Float.floatToIntBits(climbRate) != Float.floatToIntBits(other.climbRate))
 			return false;
 		if (errorCount != other.errorCount)
 			return false;
-		if (Float.floatToIntBits(frequencyOffset) != Float
-				.floatToIntBits(other.frequencyOffset))
+		if (Float.floatToIntBits(frequencyOffset) != Float.floatToIntBits(other.frequencyOffset))
 			return false;
 		if (gpsStatus == null) {
 			if (other.gpsStatus != null)
@@ -346,13 +322,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				return false;
 		} else if (!receiverName.equals(other.receiverName))
 			return false;
-		if (Float.floatToIntBits(signalStrength) != Float
-				.floatToIntBits(other.signalStrength))
+		if (Float.floatToIntBits(signalStrength) != Float.floatToIntBits(other.signalStrength))
 			return false;
 		if (stealth != other.stealth)
 			return false;
-		if (Float.floatToIntBits(turnRate) != Float
-				.floatToIntBits(other.turnRate))
+		if (Float.floatToIntBits(turnRate) != Float.floatToIntBits(other.turnRate))
 			return false;
 		return true;
 	}

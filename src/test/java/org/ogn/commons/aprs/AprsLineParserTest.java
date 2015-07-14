@@ -18,75 +18,75 @@ import org.ogn.commons.utils.JsonUtils;
 
 public class AprsLineParserTest {
 
-    @Test
-    public void test() {
+	@Test
+	public void test() {
 
-        String acBeacon1 = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
-        String brBeacon1 = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
+		String acBeacon1 = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
+		String brBeacon1 = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
 
-        AprsLineParser parser = AprsLineParser.get();
+		AprsLineParser parser = AprsLineParser.get();
 
-        AprsLineParser parser2 = AprsLineParser.get();
+		AprsLineParser parser2 = AprsLineParser.get();
 
-        // parser is expected to be a singleton
-        assertSame(parser, parser2);
+		// parser is expected to be a singleton
+		assertSame(parser, parser2);
 
-        OgnBeacon beacon = parser.parse(acBeacon1);
+		OgnBeacon beacon = parser.parse(acBeacon1);
 
-        assertNotNull(beacon);
-        assertTrue(beacon instanceof AircraftBeacon);
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof AircraftBeacon);
 
-        // ignore aircraft beacons
-        beacon = parser.parse(acBeacon1, false, true);
-        assertNull(beacon);
+		// ignore aircraft beacons
+		beacon = parser.parse(acBeacon1, false, true);
+		assertNull(beacon);
 
-        beacon = parser.parse(brBeacon1);
+		beacon = parser.parse(brBeacon1);
 
-        assertNotNull(beacon);
-        assertTrue(beacon instanceof ReceiverBeacon);
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof ReceiverBeacon);
 
-        // ignore receiver beacons
-        beacon = parser.parse(brBeacon1, true, false);
-        assertNull(beacon);
-    }
+		// ignore receiver beacons
+		beacon = parser.parse(brBeacon1, true, false);
+		assertNull(beacon);
+	}
 
-    @Test
-    public void test2() {
-        String brBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/140044h5227.15N/00108.34E'286/023/A=001200 id06DDDBBC +653fpm +0.7rot 9.0dB 0e +1.8kHz gps2x3 hearE61E";
+	@Test
+	public void test2() {
+		String brBeacon = "FLRDDDBBC>APRS,qAS,UKGRF:/140044h5227.15N/00108.34E'286/023/A=001200 id06DDDBBC +653fpm +0.7rot 9.0dB 0e +1.8kHz gps2x3 hearE61E";
 
-        String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
+		String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
 
-        AprsLineParser parser = AprsLineParser.get();
+		AprsLineParser parser = AprsLineParser.get();
 
-        OgnBeacon beacon = parser.parse(brBeacon);
+		OgnBeacon beacon = parser.parse(brBeacon);
 
-        assertNotNull(beacon);
-        assertTrue(beacon instanceof AircraftBeacon);
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof AircraftBeacon);
 
-        beacon = parser.parse(recBeacon);
+		beacon = parser.parse(recBeacon);
 
-        assertNotNull(beacon);
-        assertTrue(beacon instanceof ReceiverBeacon);
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof ReceiverBeacon);
 
-        recBeacon = "ESSX>APRS,TCPIP*,qAC,GLIDERN1:/213502h5934.92NI01630.18E&/A=000026 NTP:16000.0ms/+0.0ppm +37.0C RF:+49+0.0ppm/+0.9dB";
-        beacon = parser.parse(recBeacon);
+		recBeacon = "ESSX>APRS,TCPIP*,qAC,GLIDERN1:/213502h5934.92NI01630.18E&/A=000026 NTP:16000.0ms/+0.0ppm +37.0C RF:+49+0.0ppm/+0.9dB";
+		beacon = parser.parse(recBeacon);
 
-        assertNotNull(beacon);
-        assertTrue(beacon instanceof ReceiverBeacon);
-                        
-    }
-    
-    @Test
-    public void test3() {
-        String corruptedBeacon = "F-PVVA>APRS,qAS,CHALLES:/130435h4534.95N/00559.83E'237/105/A=002818|$#*IL<&z#XLx|";
-        AprsLineParser parser = AprsLineParser.get();
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof ReceiverBeacon);
 
-        OgnBeacon beacon = parser.parse(corruptedBeacon);
+	}
 
-        assertNotNull(beacon);
-        
-        System.out.println(JsonUtils.toJson(beacon));
-        
-    }
+	@Test
+	public void test3() {
+		String corruptedBeacon = "F-PVVA>APRS,qAS,CHALLES:/130435h4534.95N/00559.83E'237/105/A=002818|$#*IL<&z#XLx|";
+		AprsLineParser parser = AprsLineParser.get();
+
+		OgnBeacon beacon = parser.parse(corruptedBeacon);
+
+		assertNotNull(beacon);
+
+		System.out.println(JsonUtils.toJson(beacon));
+
+	}
 
 }

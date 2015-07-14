@@ -9,46 +9,47 @@ package org.ogn.commons.beacon;
  */
 public interface OgnBeacon {
 
-    /**
-     * @return packet identifier (in case of receivers - name of the receiver, in case of aircraft beacons - it can be
-     *         reg. number (resolved by the receiver) or tracker address
-     */
-    String getId();
+	/**
+	 * @return packet identifier (in case of receivers - name of the receiver,
+	 *         in case of aircraft beacons - it can be reg. number (resolved by
+	 *         the receiver) or tracker address
+	 */
+	String getId();
 
-    /**
-     * 
-     * @return UTC timestamp (unix format, ms since 1970)
-     */
-    long getTimestamp();
-    
-    /**
-     * @return beacon's latitude
-     */
-    double getLat();
+	/**
+	 * 
+	 * @return UTC timestamp (unix format, ms since 1970)
+	 */
+	long getTimestamp();
 
-    /**
-     * @return beacon's longitude
-     */
-    double getLon();
+	/**
+	 * @return beacon's latitude
+	 */
+	double getLat();
 
-    /**
-     * @return beacon's altitude (m)
-     */
-    float getAlt();
-    
-    /**
-     * deg
-     */
-    int getTrack();
+	/**
+	 * @return beacon's longitude
+	 */
+	double getLon();
 
-    /**
-     * km/h
-     */
-    float getGroundSpeed();    
-    
-    /**
-     * 
-     * @return raw (un-decoded) string representation of a packet
-     */
-    String getRawPacket();
+	/**
+	 * @return beacon's altitude (m)
+	 */
+	float getAlt();
+
+	/**
+	 * deg
+	 */
+	int getTrack();
+
+	/**
+	 * km/h
+	 */
+	float getGroundSpeed();
+
+	/**
+	 * 
+	 * @return raw (un-decoded) string representation of a packet
+	 */
+	String getRawPacket();
 }

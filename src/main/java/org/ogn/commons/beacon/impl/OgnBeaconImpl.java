@@ -38,9 +38,8 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 	protected OgnBeaconImpl() {
 	}
 
-	public OgnBeaconImpl(String rawPacket, String id, long timestamp,
-			double latitude, double longitude, float altitude, int track,
-			float groundSpeed) {
+	public OgnBeaconImpl(String rawPacket, String id, long timestamp, double latitude, double longitude,
+			float altitude, int track, float groundSpeed) {
 		this.rawPacket = rawPacket;
 		this.id = id;
 		this.timestamp = timestamp;
@@ -103,8 +102,7 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(lon);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result
-				+ ((rawPacket == null) ? 0 : rawPacket.hashCode());
+		result = prime * result + ((rawPacket == null) ? 0 : rawPacket.hashCode());
 		result = prime * result + Float.floatToIntBits(groundSpeed);
 		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 		result = prime * result + track;
@@ -136,8 +134,7 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 				return false;
 		} else if (!rawPacket.equals(other.rawPacket))
 			return false;
-		if (Float.floatToIntBits(groundSpeed) != Float
-				.floatToIntBits(other.groundSpeed))
+		if (Float.floatToIntBits(groundSpeed) != Float.floatToIntBits(other.groundSpeed))
 			return false;
 		if (timestamp != other.timestamp)
 			return false;

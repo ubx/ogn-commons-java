@@ -14,20 +14,20 @@ import org.ogn.commons.db.FileDbDescriptorProvider;
 
 public class OgnDbDescriptorProviderTest {
 
-    @Test
-    public void test() throws Exception {
-        AircraftDescriptorProvider provider = new FileDbDescriptorProvider<OgnDb>(OgnDb.class,
-                "src/test/resources/ogn-ddb.txt", 2000);
+	@Test
+	public void test() throws Exception {
+		AircraftDescriptorProvider provider = new FileDbDescriptorProvider<OgnDb>(OgnDb.class,
+				"src/test/resources/ogn-ddb.txt", 2000);
 
-        assertNotNull(provider);
+		assertNotNull(provider);
 
-        Thread.sleep(1000);
+		Thread.sleep(1000);
 
-        AircraftDescriptor desc = provider.findDescriptor("DD83CE");
-        assertNotNull(desc);
+		AircraftDescriptor desc = provider.findDescriptor("DD83CE");
+		assertNotNull(desc);
 
-        assertEquals("F-CLMT", desc.getRegNumber());
+		assertEquals("F-CLMT", desc.getRegNumber());
 
-    }
+	}
 
 }
