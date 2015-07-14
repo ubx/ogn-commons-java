@@ -38,23 +38,18 @@ public class IgcLoggerTest {
 			"FLRDDA4EC>APRS,qAS,EHHO:/102538h5243.82N/00632.57E'/A=000050 id06DDA4EC +020fpm +0.0rot 20.8dB 0e -7.6kHz gps2x2",
 			"FLRDDF984>APRS,qAS,Salland:/102539h5228.39N/00621.07E'124/057/A=000512 id06DDD7F8 -157fpm +1.2rot 23.2dB 0e -1.2kHz gps2x2 hearD7EA hearDA95" };
 
-	static AircraftDescriptor ad1 = new AircraftDescriptorImpl("A-BCD", "aa",
-			"Jantar std 2", true, true);
-	static AircraftDescriptor ad2 = new AircraftDescriptorImpl("X-ABC", "w2",
-			"ASW 20", true, true);
-	static AircraftDescriptor ad3 = new AircraftDescriptorImpl("F-ABC", "",
-			"Pegase 90", true, true);
-	static AircraftDescriptor ad4 = new AircraftDescriptorImpl("PH-8020", "3c",
-			"Discus", true, true);
+	static AircraftDescriptor ad1 = new AircraftDescriptorImpl("A-BCD", "aa", "Jantar std 2", true, true);
+	static AircraftDescriptor ad2 = new AircraftDescriptorImpl("X-ABC", "w2", "ASW 20", true, true);
+	static AircraftDescriptor ad3 = new AircraftDescriptorImpl("F-ABC", "", "Pegase 90", true, true);
+	static AircraftDescriptor ad4 = new AircraftDescriptorImpl("PH-8020", "3c", "Discus", true, true);
 
 	static AircraftDescriptor[] descriptors = { ad1, ad2, ad3, ad3, ad3, ad4 };
 
 	static String getDate() {
 		Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		return new String(String.format("%04d", calendar.get(Calendar.YEAR))
-				+ "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1)
-				+ "-"
+		return new String(String.format("%04d", calendar.get(Calendar.YEAR)) + "-"
+				+ String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-"
 				+ String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
 	}
 
@@ -72,15 +67,13 @@ public class IgcLoggerTest {
 		if (Files.exists(dir)) {
 			Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
 				@Override
-				public FileVisitResult visitFile(Path file,
-						BasicFileAttributes attrs) throws IOException {
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					Files.delete(file);
 					return FileVisitResult.CONTINUE;
 				}
 
 				@Override
-				public FileVisitResult postVisitDirectory(Path directory,
-						IOException exc) throws IOException {
+				public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
 					Files.delete(directory);
 					return FileVisitResult.CONTINUE;
 				}
@@ -127,15 +120,13 @@ public class IgcLoggerTest {
 
 		Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
 			@Override
-			public FileVisitResult visitFile(Path file,
-					BasicFileAttributes attrs) throws IOException {
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 				files.add(file);
 				return FileVisitResult.CONTINUE;
 			}
 
 			@Override
-			public FileVisitResult postVisitDirectory(Path directory,
-					IOException exc) throws IOException {
+			public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
 				return FileVisitResult.CONTINUE;
 			}
 
@@ -161,8 +152,7 @@ public class IgcLoggerTest {
 		assertEquals(rows, lines.size());
 	}
 
-	private static void verifyHeader(Path file, AircraftDescriptor descriptor)
-			throws Exception {
+	private static void verifyHeader(Path file, AircraftDescriptor descriptor) throws Exception {
 		List<String> lines = Files.readAllLines(file, Charset.defaultCharset());
 
 		int expectedFieldsCounter = 0;
@@ -171,11 +161,9 @@ public class IgcLoggerTest {
 				String[] tokens = line.split(":");
 				expectedFieldsCounter++;
 
-				if (descriptor.getRegNumber() != null
-						& descriptor.getRegNumber().length() > 0)
+				if (descriptor.getRegNumber() != null & descriptor.getRegNumber().length() > 0)
 					if (tokens.length > 1)
-						assertEquals(descriptor.getRegNumber(),
-								tokens[1].trim());
+						assertEquals(descriptor.getRegNumber(), tokens[1].trim());
 					else
 						fail("Aircraft model not found in the header");
 
@@ -183,8 +171,7 @@ public class IgcLoggerTest {
 				String[] tokens = line.split(":");
 				expectedFieldsCounter++;
 
-				if (descriptor.getModel() != null
-						& descriptor.getModel().length() > 0)
+				if (descriptor.getModel() != null & descriptor.getModel().length() > 0)
 					if (tokens.length > 1)
 						assertEquals(descriptor.getModel(), tokens[1].trim());
 					else
@@ -193,8 +180,7 @@ public class IgcLoggerTest {
 				String[] tokens = line.split(":");
 				expectedFieldsCounter++;
 
-				if (descriptor.getCN() != null
-						& descriptor.getCN().length() > 0)
+				if (descriptor.getCN() != null & descriptor.getCN().length() > 0)
 					if (tokens.length > 1)
 						assertEquals(descriptor.getCN(), tokens[1].trim());
 					else
