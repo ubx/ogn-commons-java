@@ -225,6 +225,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 
 			} else if ((matcher = versionPattern.matcher(aprsParam)).matches()) {
 				version = matcher.group(1);
+				platform = matcher.group(2);
 			} else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
 				cpuLoad = Float.parseFloat(matcher.group(1));
 			} else if ((matcher = cpuTempPattern.matcher(aprsParam)).matches()) {
