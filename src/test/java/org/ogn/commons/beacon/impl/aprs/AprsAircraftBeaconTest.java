@@ -131,8 +131,17 @@ public class AprsAircraftBeaconTest {
 
 		assertNotNull(acBeacon);
 		System.out.println(JsonUtils.toJson(b1));
+	}
+	
+	@Test
+	public void test7() {
 
-		// assertEquals(AddressType.UNRECOGNIZED, b1.getAddressType());
+		String acBeacon = "FLRDDEAAB>APRS,qAS,Hornberg:/153^^509h4844.83N/00951.62E'301/001/A=002365 33sss3 XX!~@SS id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+
+		assertNotNull(acBeacon);
+		assertEquals(acBeacon,b1.getRawPacket());
+		System.out.println(JsonUtils.toJson(b1));
 	}
 
 }

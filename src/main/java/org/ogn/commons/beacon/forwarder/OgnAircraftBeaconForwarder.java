@@ -8,7 +8,8 @@ import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 
 /**
- * this interface is to be implemented by plugins to the ogn gateway
+ * this interface is to be implemented by these ogn gateway plugins who want to
+ * receive aircraft beacon updates
  * 
  * @author wbuczak
  */
@@ -20,5 +21,5 @@ public interface OgnAircraftBeaconForwarder extends OgnBeaconForwarder {
 	 * @param descriptor
 	 *            static aircraft description
 	 */
-	void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor, String rawBeacon);
+	void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor);
 }
