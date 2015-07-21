@@ -133,7 +133,7 @@ public class AprsAircraftBeaconTest {
 		assertNotNull(b1);
 		System.out.println(JsonUtils.toJson(b1));
 	}
-	
+
 	@Test
 	public void test7() {
 
@@ -141,20 +141,20 @@ public class AprsAircraftBeaconTest {
 		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
-		assertEquals(acBeacon,b1.getRawPacket());
+		assertEquals(acBeacon, b1.getRawPacket());
 		System.out.println(JsonUtils.toJson(b1));
 	}
-	
+
 	@Test
 	public void test8() {
-		
+
 		// test the extended format of APRS packet (additional lat/lon digits)
 		String acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W61! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
 		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
-		
+
 		acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W00! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
 		AircraftBeacon b2 = new AprsAircraftBeacon(acBeacon);
-	
+
 		assertNotNull(b1);
 		assertNotNull(b2);
 

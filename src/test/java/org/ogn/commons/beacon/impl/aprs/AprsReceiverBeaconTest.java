@@ -101,7 +101,7 @@ public class AprsReceiverBeaconTest {
 		String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
 		ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
-				
+
 		assertEquals(recBeacon, b1.getRawPacket());
 
 		// still, the object should be created (although its attributes will not

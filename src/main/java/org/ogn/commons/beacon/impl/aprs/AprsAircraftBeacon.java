@@ -217,13 +217,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				alt = feetsToMetres(Float.parseFloat(matcher.group(11)));
 
 			} else if ((matcher = coordinatesExtensionPattern.matcher(aprsParam)).matches()) {
-				float dlat = Integer.parseInt(matcher.group(1));
-				dlat = dlat / 1000;
-				float dlon = Integer.parseInt(matcher.group(2));
-				dlon = dlon / 1000;
+				double dlat = Double.parseDouble(matcher.group(1)) / 1000 / 60;
+				double dlon = Double.parseDouble(matcher.group(2)) / 1000 / 60;
 
-				lat += dlat;
-				lon += dlon;
+				lat += lat > 0 ? dlat : -dlat;
+				lon += lon > 0 ? dlon : -dlon;
 			} else if ((matcher = addressPattern.matcher(aprsParam)).matches()) {
 				address = matcher.group(1).substring(2, 8);
 				// Flarm ID type byte in APRS msg: PTTT TTII
