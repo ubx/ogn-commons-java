@@ -63,9 +63,9 @@
 					<aggregate>true</aggregate>
 					<show>public</show>
 					<nohelp>true</nohelp>
-					<header>${artifactId}, ${project.version}</header>
+					<header>${project.artifactId}, ${project.version}</header>
 					<footer>${project.name}</footer>
-					<doctitle>${artifactId}, ${project.version}</doctitle>
+					<doctitle>${project.artifactId}, ${project.version}</doctitle>
 				</configuration>
 			</plugin>
 
@@ -75,7 +75,8 @@
 				<version>1.0-beta-2</version>
 				<configuration>
 					<checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
-					<checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
+					<checkinComment>Publishing javadoc for
+						${project.artifactId}:${project.version}</checkinComment>
 					<content>${project.reporting.outputDirectory}/apidocs</content>
 					<skipDeletedFiles>true</skipDeletedFiles>
 					<pubScmUrl>scm:git:https://github.com/glidernet/${project.artifactId}</pubScmUrl>
