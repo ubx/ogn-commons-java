@@ -103,8 +103,8 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	private static final Pattern turnRatePattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)rot");
 	private static final Pattern signalStrengthPattern = Pattern.compile("(\\d+\\.\\d+)dB");
 	private static final Pattern errorCountPattern = Pattern.compile("(\\d+)e");
+	private static final Pattern coordinatesExtensionPattern = Pattern.compile("\\!W(.)(.)!");
 
-	// TODO: manage multiple heard ids
 	private static final Pattern hearIDPattern = Pattern.compile("hear(\\w{4})");
 	private static final Pattern frequencyOffsetPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)kHz");
 	private static final Pattern gpsStatusPattern = Pattern.compile("gps(\\d+x\\d+)");
@@ -216,6 +216,14 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				}
 				alt = feetsToMetres(Float.parseFloat(matcher.group(11)));
 
+			} else if ((matcher = coordinatesExtensionPattern.matcher(aprsParam)).matches()) {
+				float dlat = Integer.parseInt(matcher.group(1));
+				dlat = dlat / 1000;
+				float dlon = Integer.parseInt(matcher.group(2));
+				dlon = dlon / 1000;
+
+				lat += dlat;
+				lon += dlon;
 			} else if ((matcher = addressPattern.matcher(aprsParam)).matches()) {
 				address = matcher.group(1).substring(2, 8);
 				// Flarm ID type byte in APRS msg: PTTT TTII
