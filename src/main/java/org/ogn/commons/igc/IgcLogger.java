@@ -60,6 +60,10 @@ public class IgcLogger {
 		}
 	}
 
+	public int getQueueSize() {
+		return this.logRecords.size();
+	}
+
 	private class PollerTask implements Runnable {
 		private Logger PLOG = LoggerFactory.getLogger(PollerTask.class);
 
