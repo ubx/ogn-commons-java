@@ -79,6 +79,9 @@ public class IgcLogger {
 					PLOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
 					Thread.currentThread().interrupt();
 					continue;
+				} catch (Exception e) {
+					PLOG.error("exception caught",e);					
+					continue;
 				}
 			}// while
 			PLOG.trace("exiting..");
