@@ -58,7 +58,7 @@ public interface AircraftBeacon extends OgnBeacon {
 	float getFrequencyOffset();
 
 	/**
-	 * GPS status (number of sat received ?)
+	 * GPS status (GPS accuracy in meters, horizontal and vertical)
 	 */
 	String getGpsStatus();
 

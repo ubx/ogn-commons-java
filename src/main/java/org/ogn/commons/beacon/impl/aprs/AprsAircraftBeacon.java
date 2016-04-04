@@ -85,7 +85,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	protected float frequencyOffset; // in KHz
 
 	/**
-	 * GPS status (number of sat received ?)
+	 * GPS status (GPS accuracy in meters, horizontal and vertical)
 	 */
 	protected String gpsStatus;
 
