@@ -40,6 +40,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	protected String address;
 
 	/**
+	 * Original (FLARM) address. If one sets ICAO address this one will still point to the original FLARM device id
+	 */
+	protected String originalAddress;
+
+	/**
 	 * id can be either ICAO, FLARM or OGN
 	 */
 	protected AddressType addressType = AddressType.UNRECOGNIZED;
@@ -70,6 +75,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	protected float signalStrength;
 
 	/**
+	 * estimated effective radiated power of the transmitter
+	 */
+	protected float erp = Float.NaN;
+
+	/**
 	 * frequency offset measured in KHz
 	 */
 	protected float frequencyOffset; // in KHz
@@ -85,6 +95,16 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	protected int errorCount;
 
 	/**
+	 * 8-bit hardware version (hex)
+	 */
+	protected int hardwareVersion;
+
+	/**
+	 * version of the transmitter's firmware
+	 */
+	protected float firmwareVersion = Float.NaN;
+
+	/**
 	 * id of another aircraft received by this aircraft
 	 */
 	protected Set<String> heardAircraftIds = new HashSet<>();
@@ -95,8 +115,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	// D-4465>APRS,qAS,EDMA:/132350h4825.31N/01055.79E'112/002/A=001512
 	// id06DF03B3 -019fpm +0.0rot 39.0dB 0e -6.7kHz gps1x2 hear0CC5 hearABA7
 
-	private static final Pattern basicAprsPattern = Pattern
-			.compile("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
+	// ICA4B4E68>APRS,qAS,Letzi:/152339h4726.50N/00814.20E'260/059/A=002253 !W65! id054B4E68 -395fpm -1.5rot 16.5dB 0e
+	// -14.3kHz gps1x2 s6.05 h43 rDF0CD1 +4.5dBm";
+
+	private static final Pattern basicAprsPattern = Pattern.compile(
+			"(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
 
 	private static final Pattern addressPattern = Pattern.compile("id(\\S{8})");
 	private static final Pattern climbRatePattern = Pattern.compile("(\\+|\\-)(\\d+)fpm");
@@ -108,6 +131,10 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	private static final Pattern hearIDPattern = Pattern.compile("hear(\\w{4})");
 	private static final Pattern frequencyOffsetPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)kHz");
 	private static final Pattern gpsStatusPattern = Pattern.compile("gps(\\d+x\\d+)");
+	private static final Pattern firmwareVersionPattern = Pattern.compile("s(\\d+\\.\\d+)");
+	private static final Pattern hwVersionPattern = Pattern.compile("h([0-9a-fA-F]{2})");
+	private static final Pattern originalAddressPattern = Pattern.compile("r(\\S{6})");
+	private static final Pattern erpPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)dBm");
 
 	@Override
 	public String getReceiverName() {
@@ -127,6 +154,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	@Override
 	public String getAddress() {
 		return address;
+	}
+
+	@Override
+	public String getOriginalAddress() {
+		return originalAddress;
 	}
 
 	@Override
@@ -177,6 +209,21 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	@Override
 	public String[] getHeardAircraftIds() {
 		return heardAircraftIds.toArray(new String[0]);
+	}
+
+	@Override
+	public float getFirmwareVersion() {
+		return firmwareVersion;
+	}
+
+	@Override
+	public float getERP() {
+		return erp;
+	}
+
+	@Override
+	public int getHardwareVersion() {
+		return hardwareVersion;
 	}
 
 	// private default constructor
@@ -258,14 +305,23 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 					frequencyOffset *= -1;
 			} else if ((matcher = gpsStatusPattern.matcher(aprsParam)).matches()) {
 				gpsStatus = matcher.group(1);
+			} else if ((matcher = firmwareVersionPattern.matcher(aprsParam)).matches()) {
+				firmwareVersion = Float.parseFloat(matcher.group(1));
+			} else if ((matcher = hwVersionPattern.matcher(aprsParam)).matches()) {
+				hardwareVersion = Integer.parseInt(matcher.group(1), 16);
+			} else if ((matcher = originalAddressPattern.matcher(aprsParam)).matches()) {
+				originalAddress = matcher.group(1);
+			} else if ((matcher = erpPattern.matcher(aprsParam)).matches()) {
+				erp = Float.parseFloat(matcher.group(2));
 			} else {
+
 				unmachedParams.add(aprsParam);
 			}
 		}
 
 		if (!unmachedParams.isEmpty()) {
-			System.err.println(String.format("aprs-sentence:[%s] unmatched aprs parms: %s", aprsSentence,
-					unmachedParams));
+			// System.err.println(String.format("aprs-sentence:[%s] unmatched aprs parms: %s", aprsSentence,
+			// unmachedParams));
 			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
 		}
 	}
@@ -278,10 +334,14 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		result = prime * result + ((addressType == null) ? 0 : addressType.hashCode());
 		result = prime * result + ((aircraftType == null) ? 0 : aircraftType.hashCode());
 		result = prime * result + Float.floatToIntBits(climbRate);
+		result = prime * result + Float.floatToIntBits(erp);
 		result = prime * result + errorCount;
+		result = prime * result + Float.floatToIntBits(firmwareVersion);
 		result = prime * result + Float.floatToIntBits(frequencyOffset);
 		result = prime * result + ((gpsStatus == null) ? 0 : gpsStatus.hashCode());
+		result = prime * result + hardwareVersion;
 		result = prime * result + ((heardAircraftIds == null) ? 0 : heardAircraftIds.hashCode());
+		result = prime * result + ((originalAddress == null) ? 0 : originalAddress.hashCode());
 		result = prime * result + ((receiverName == null) ? 0 : receiverName.hashCode());
 		result = prime * result + Float.floatToIntBits(signalStrength);
 		result = prime * result + (stealth ? 1231 : 1237);
@@ -309,7 +369,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 			return false;
 		if (Float.floatToIntBits(climbRate) != Float.floatToIntBits(other.climbRate))
 			return false;
+		if (Float.floatToIntBits(erp) != Float.floatToIntBits(other.erp))
+			return false;
 		if (errorCount != other.errorCount)
+			return false;
+		if (Float.floatToIntBits(firmwareVersion) != Float.floatToIntBits(other.firmwareVersion))
 			return false;
 		if (Float.floatToIntBits(frequencyOffset) != Float.floatToIntBits(other.frequencyOffset))
 			return false;
@@ -318,10 +382,17 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				return false;
 		} else if (!gpsStatus.equals(other.gpsStatus))
 			return false;
+		if (hardwareVersion != other.hardwareVersion)
+			return false;
 		if (heardAircraftIds == null) {
 			if (other.heardAircraftIds != null)
 				return false;
 		} else if (!heardAircraftIds.equals(other.heardAircraftIds))
+			return false;
+		if (originalAddress == null) {
+			if (other.originalAddress != null)
+				return false;
+		} else if (!originalAddress.equals(other.originalAddress))
 			return false;
 		if (receiverName == null) {
 			if (other.receiverName != null)

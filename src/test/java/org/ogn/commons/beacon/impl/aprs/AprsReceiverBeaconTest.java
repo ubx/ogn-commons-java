@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.ogn.commons.beacon.ReceiverBeacon;
-import org.ogn.commons.utils.JsonUtils;
 
 public class AprsReceiverBeaconTest {
 
@@ -35,7 +34,7 @@ public class AprsReceiverBeaconTest {
 
 		assertNotNull(b1);
 
-		System.out.println(JsonUtils.toJson(b1));
+		// System.out.println(JsonUtils.toJson(b1));
 
 		assertEquals(recBeacon, b1.getRawPacket());
 
@@ -94,6 +93,11 @@ public class AprsReceiverBeaconTest {
 		assertEquals(20, b1.getTrack());
 		assertEquals(18.52, b1.getGroundSpeed(), 1e-4);
 		assertEquals("x86", b1.getPlatform());
+
+		// v.0.2.5 - just to make sure ther's no difference in the 0.2.5 beacon format
+		recBeacon = "Annecy>APRS,TCPIP*,qAC,GLIDERN1:/000024h4552.11NI00612.79E&/A=002132 v0.2.5.ARM CPU:0.6 RAM:651.4/877.1MB NTP:6.5ms/+6.1ppm +34.0C RF:+47-1.9ppm/+1.42dB";
+		b1 = new AprsReceiverBeacon(recBeacon);
+		assertEquals("0.2.5", b1.getVersion());
 	}
 
 	@Test

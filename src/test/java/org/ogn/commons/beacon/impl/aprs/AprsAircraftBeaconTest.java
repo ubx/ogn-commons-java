@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.ogn.commons.beacon.AddressType.FLARM;
+import static org.ogn.commons.beacon.AddressType.ICAO;
 import static org.ogn.commons.beacon.AircraftType.GLIDER;
 
 import java.util.Arrays;
@@ -131,7 +132,12 @@ public class AprsAircraftBeaconTest {
 		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
-		System.out.println(JsonUtils.toJson(b1));
+
+		String jsonB1 = JsonUtils.toJson(b1);
+
+		AircraftBeacon b2 = JsonUtils.fromJson(jsonB1, AprsAircraftBeacon.class);
+
+		assertEquals(b1, b2);
 	}
 
 	@Test
@@ -142,7 +148,6 @@ public class AprsAircraftBeaconTest {
 
 		assertNotNull(b1);
 		assertEquals(acBeacon, b1.getRawPacket());
-		System.out.println(JsonUtils.toJson(b1));
 	}
 
 	@Test
@@ -160,6 +165,41 @@ public class AprsAircraftBeaconTest {
 
 		assertTrue(b1.getLat() > b2.getLat());
 		assertTrue(b1.getLon() > b2.getLon());
+	}
+
+	@Test
+	// test parsing of new fields in beacon as from v. 0.2.5
+	public void test9() {
+		String acBeacon = "ICA4B4E68>APRS,qAS,Letzi:/152339h4726.50N/00814.20E'260/059/A=002253 !W65! id054B4E68 -395fpm -1.5rot 16.5dB 0e -14.3kHz gps1x2 s6.05 h4C rDF0CD1 +4.5dBm";
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+
+		assertNotNull(b1);
+
+		assertEquals(acBeacon, b1.getRawPacket());
+
+		assertEquals(0, AprsUtils.toUtcTimestamp(15, 23, 39) - b1.getTimestamp());
+
+		assertEquals("Letzi", b1.getReceiverName());
+		assertEquals(GLIDER, b1.getAircraftType());
+
+		assertEquals(ICAO, b1.getAddressType());
+		assertEquals("4B4E68", b1.getAddress());
+		assertEquals("DF0CD1", b1.getOriginalAddress());
+
+		assertEquals(6.05f, b1.getFirmwareVersion(), 0.01f);
+		assertEquals(0x4C, b1.getHardwareVersion());
+		assertEquals(4.5f, b1.getERP(), 0.01f);
+
+		String jsonB1 = JsonUtils.toJson(b1);
+		System.out.println(jsonB1);
+
+		AircraftBeacon b2 = JsonUtils.fromJson(jsonB1, AprsAircraftBeacon.class);
+
+		String jsonB2 = JsonUtils.toJson(b2);
+
+		System.out.println(jsonB2);
+
+		assertEquals(b1, b2);
 	}
 
 }
