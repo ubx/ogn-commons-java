@@ -21,14 +21,19 @@ public interface AircraftBeacon extends OgnBeacon {
 	String getAddress();
 
 	/**
+	 * 
+	 * Original (FLARM) address. If one sets ICAO address this one will still point to the original FLARM device id
+	 */
+	String getOriginalAddress();
+
+	/**
 	 * type of an aircraft (Glider, tow plane, helicopter, etc..)
 	 */
 	AircraftType getAircraftType();
 
 	/**
-	 * stealth mode active or not. This is for internal use only, because a
-	 * standard client will NOT be receiving aircraft beacons with stealth flag
-	 * on
+	 * stealth mode active or not. This is for internal use only, because a standard client will NOT be receiving
+	 * aircraft beacons with stealth flag on
 	 */
 	boolean isStealth();
 
@@ -66,4 +71,22 @@ public interface AircraftBeacon extends OgnBeacon {
 	 * ids of other aircraft received by this aircraft
 	 */
 	String[] getHeardAircraftIds();
+
+	/**
+	 * version of the transmitter's firmware
+	 */
+	float getFirmwareVersion();
+
+	/**
+	 * 
+	 * @return 8-bit hardware version
+	 */
+	int getHardwareVersion();
+
+	/**
+	 * 
+	 * @return estimated effective radiated power of the transmitter
+	 */
+	float getERP();
+
 }
