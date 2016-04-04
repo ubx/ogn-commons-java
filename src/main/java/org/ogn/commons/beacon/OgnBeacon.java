@@ -33,7 +33,7 @@ public interface OgnBeacon {
 	double getLon();
 
 	/**
-	 * @return beacon's altitude (m)
+	 * @return beacon's GPS altitude (m)
 	 */
 	float getAlt();
 

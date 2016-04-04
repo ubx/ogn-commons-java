@@ -89,4 +89,9 @@ public interface AircraftBeacon extends OgnBeacon {
 	 */
 	float getERP();
 
+	/**
+	 * @return beacon's barometric altitude (in feet!) or NaN if not available
+	 * 
+	 */
+	int getBaroAlt();
 }

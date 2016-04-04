@@ -200,6 +200,10 @@ public class AprsAircraftBeaconTest {
 		System.out.println(jsonB2);
 
 		assertEquals(b1, b2);
+		
+		acBeacon = "OGN01542C>APRS,qAS,Kalkar:/171745h5144.77N/00616.69E'000/000/A=000069 !W16! id0701542C +000fpm +0.0rot FL001.08 56.2dB 0e -7.4kHz";
+		b1 = new AprsAircraftBeacon(acBeacon);
+		assertEquals(108,b1.getBaroAlt());			
 	}
 
 }
