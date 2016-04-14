@@ -20,7 +20,6 @@ import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftType;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
-import org.ogn.commons.utils.AprsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,11 +80,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	protected float erp = Float.NaN;
 
 	/**
-	 * beacon's barometric altitude (in feet!)
-	 */
-	protected int baroAlt;
-
-	/**
 	 * frequency offset measured in KHz
 	 */
 	protected float frequencyOffset; // in KHz
@@ -141,7 +135,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	private static final Pattern hwVersionPattern = Pattern.compile("h([0-9a-fA-F]{2})");
 	private static final Pattern originalAddressPattern = Pattern.compile("r(\\S{6})");
 	private static final Pattern erpPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)dBm");
-	private static final Pattern baroAltPattern = Pattern.compile("FL(\\d+\\.\\d+)");
 
 	@Override
 	public String getReceiverName() {
@@ -226,11 +219,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	@Override
 	public float getERP() {
 		return erp;
-	}
-
-	@Override
-	public int getBaroAlt() {
-		return baroAlt;
 	}
 
 	@Override
@@ -325,9 +313,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				originalAddress = matcher.group(1);
 			} else if ((matcher = erpPattern.matcher(aprsParam)).matches()) {
 				erp = Float.parseFloat(matcher.group(2));
-			} else if ((matcher = baroAltPattern.matcher(aprsParam)).matches()) {
-				baroAlt = AprsUtils.flToFeets(Float.parseFloat(matcher.group(1)));
-
 			} else {
 
 				unmachedParams.add(aprsParam);
@@ -348,7 +333,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + ((addressType == null) ? 0 : addressType.hashCode());
 		result = prime * result + ((aircraftType == null) ? 0 : aircraftType.hashCode());
-		result = prime * result + baroAlt;
 		result = prime * result + Float.floatToIntBits(climbRate);
 		result = prime * result + Float.floatToIntBits(erp);
 		result = prime * result + errorCount;
@@ -382,8 +366,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		if (addressType != other.addressType)
 			return false;
 		if (aircraftType != other.aircraftType)
-			return false;
-		if (baroAlt != other.baroAlt)
 			return false;
 		if (Float.floatToIntBits(climbRate) != Float.floatToIntBits(other.climbRate))
 			return false;

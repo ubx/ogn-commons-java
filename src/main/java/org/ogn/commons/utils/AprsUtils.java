@@ -164,10 +164,6 @@ public class AprsUtils {
 	public static float feetsToMetres(float feets) {
 		return (float) (Math.round((feets / (float) 3.2808) * 10) / 10.0);
 	}
-	
-	public static int flToFeets(float fl) {				
-		return Math.round(fl * 100);
-	}
 
 	public static float kntToKmh(float knts) {
 		return knts * (float) 1.852; // kts to km/h
