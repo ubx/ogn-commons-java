@@ -12,9 +12,10 @@ import static java.lang.String.format;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import org.ogn.commons.beacon.OgnBeacon;
@@ -22,9 +23,8 @@ import org.ogn.commons.beacon.OgnBeacon;
 public class AprsUtils {
 
 	/**
-	 * Generates APRS login sentence, required by APRS server. Refer to <a
-	 * href="http://www.aprs-is.net/Connecting.aspx">Connecting to APRS-IS</a>
-	 * for details.
+	 * Generates APRS login sentence, required by APRS server. Refer to
+	 * <a href="http://www.aprs-is.net/Connecting.aspx">Connecting to APRS-IS</a> for details.
 	 * 
 	 * @param userName
 	 * @param passCode
@@ -35,8 +35,8 @@ public class AprsUtils {
 	 */
 	public static String formatAprsLoginLine(final String userName, final String passCode, final String appName,
 			final String version, final String filter) {
-		return filter == null ? format("user %s pass %s vers %s %s", userName, passCode, appName, version) : format(
-				"user %s pass %s vers %s %s filter %s", userName, passCode, appName, version, filter);
+		return filter == null ? format("user %s pass %s vers %s %s", userName, passCode, appName, version)
+				: format("user %s pass %s vers %s %s filter %s", userName, passCode, appName, version, filter);
 	}
 
 	public static String formatAprsLoginLine(final String userName, final String passCode, final String appName,
@@ -45,11 +45,9 @@ public class AprsUtils {
 	}
 
 	/**
-	 * @return a unique client id(based on the host name + sequence id) which
-	 *         can be used as APRS user name. The max length is 9 characters and
-	 *         complies with APRS <a
-	 *         href="http://www.aprs-is.net/Connecting.aspx#loginrules"> Login
-	 *         rules </a>
+	 * @return a unique client id(based on the host name + sequence id) which can be used as APRS user name. The max
+	 *         length is 9 characters and complies with APRS
+	 *         <a href="http://www.aprs-is.net/Connecting.aspx#loginrules"> Login rules </a>
 	 */
 	public static String generateClientId() {
 		try {
@@ -118,8 +116,7 @@ public class AprsUtils {
 	}
 
 	/**
-	 * Creates a unix timestamp, based on given h:m:s. Local system's date is
-	 * taken as a reference
+	 * Creates a unix timestamp, based on given h:m:s. Local system's date is taken as a reference
 	 * 
 	 * @param h
 	 *            hour
@@ -130,27 +127,12 @@ public class AprsUtils {
 	 * @return
 	 */
 	public static long toUtcTimestamp(int h, int m, int s) {
-		// Get today's date and time.
-		Calendar c1 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		c1.setTime(new Date());
-
-		// TODO: take care of the rare situations when a packet arrives just
-		// after midnight
-		// yet it is delayed and its timestamp is set to 2359xx. We cannot take
-		// the current day
-		// number as a reference in such case, but we should move one day back.
-
-		c1.set(Calendar.HOUR_OF_DAY, h);
-		c1.set(Calendar.MINUTE, m);
-		c1.set(Calendar.SECOND, s);
-		// return the timestamp with sec. precision
-		return (c1.getTimeInMillis() / 1000) * 1000;
+		return LocalDateTime.of(LocalDate.now(), LocalTime.of(h, m, s)).toEpochSecond(ZoneOffset.UTC) * 1000;
 	}
 
 	/**
 	 * @param time
-	 *            time in 6 digit format provided in a APRS packet (e.g. 162334,
-	 *            051202)
+	 *            time in 6 digit format provided in a APRS packet (e.g. 162334, 051202)
 	 * @return
 	 */
 	public static long toUtcTimestamp(String time) {

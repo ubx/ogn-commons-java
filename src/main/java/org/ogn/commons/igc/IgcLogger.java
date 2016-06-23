@@ -7,9 +7,8 @@ package org.ogn.commons.igc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The IGC logger creates and writes to IGC files. The logger's log() operation
- * is non-blocking (logs are written to a file by a background thread)
+ * The IGC logger creates and writes to IGC files. The logger's log() operation is non-blocking (logs are written to a
+ * file by a background thread)
  * 
  * @author Seb, wbuczak
  */
@@ -80,10 +79,10 @@ public class IgcLogger {
 					Thread.currentThread().interrupt();
 					continue;
 				} catch (Exception e) {
-					PLOG.error("exception caught",e);					
+					PLOG.error("exception caught", e);
 					continue;
 				}
-			}// while
+			} // while
 			PLOG.trace("exiting..");
 		}
 	}
@@ -112,20 +111,20 @@ public class IgcLogger {
 		this(logsFolder, Mode.ASYNC);
 	}
 
-	private void writeIgcHeader(FileWriter igcFile, Calendar calendar, AircraftDescriptor descriptor) {
+	private void writeIgcHeader(FileWriter igcFile, ZonedDateTime utcDateTime, AircraftDescriptor descriptor) {
 
 		// Write IGC file header
 		StringBuilder bld = new StringBuilder();
 		try {
 			bld.append("AGNE001 OGN gateway").append(LINE_SEP);
-			bld.append("HFDTE").append(String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)))
-					.append(String.format("%02d", calendar.get(Calendar.MONTH) + 1))
-					.append(String.format("%04d", calendar.get(Calendar.YEAR)).substring(2)); // last
-																								// 2
-																								// chars
-																								// of
-																								// the
-																								// year
+			bld.append("HFDTE").append(String.format("%02d", utcDateTime.getDayOfMonth()))
+					.append(String.format("%02d", utcDateTime.getMonthValue()))
+					.append(String.format("%04d", utcDateTime.getYear()).substring(2)); // last
+																						// 2
+																						// chars
+																						// of
+																						// the
+																						// year
 
 			if (descriptor != null && descriptor.isKnown())
 				bld.append(LINE_SEP).append("HFGIDGLIDERID:").append(descriptor.getRegNumber()).append(LINE_SEP)
@@ -143,12 +142,11 @@ public class IgcLogger {
 
 		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
 
-		Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-		calendar.setTimeInMillis(System.currentTimeMillis());
+		ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
 
-		String dateString = new String(String.format("%04d", calendar.get(Calendar.YEAR)) + "-"
-				+ String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-"
-				+ String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
+		String dateString = new String(String.format("%04d", utcDateTime.getYear()) + "-"
+				+ String.format("%02d", utcDateTime.getMonth().getValue()) + "-"
+				+ String.format("%02d", utcDateTime.getDayOfMonth()));
 
 		// Generate filename from date and immat
 		String igcFileName = new String(dateString + "_" + igcId + ".IGC");
@@ -193,7 +191,7 @@ public class IgcLogger {
 		// if this is a brand new file - write the header
 		if (writeHeader) {
 			// write the igc header
-			writeIgcHeader(igcFile, calendar, descriptor);
+			writeIgcHeader(igcFile, utcDateTime, descriptor);
 		}
 
 		// Add fix
@@ -204,9 +202,9 @@ public class IgcLogger {
 			// log original APRS sentence to IGC file for debug, SAR & co
 			bld.append("LGNE ").append(beacon.getRawPacket()).append(LINE_SEP);
 
-			bld.append("B").append(String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY)))
-					.append(String.format("%02d", calendar.get(Calendar.MINUTE)))
-					.append(String.format("%02d", calendar.get(Calendar.SECOND)))
+			bld.append("B").append(String.format("%02d", utcDateTime.getHour()))
+					.append(String.format("%02d", utcDateTime.getMinute()))
+					.append(String.format("%02d", utcDateTime.getSecond()))
 					.append(AprsUtils.degToIgc(beacon.getLat(), Coordinate.LAT))
 					.append(AprsUtils.degToIgc(beacon.getLon(), Coordinate.LON)).append("A") // A
 																								// for
@@ -245,8 +243,8 @@ public class IgcLogger {
 	 * @param alt
 	 *            altitude
 	 * @param comment
-	 *            a string which will fall into the igc file as a comment (e.g.
-	 *            aprs sentence can be logged for debugging purposes)
+	 *            a string which will fall into the igc file as a comment (e.g. aprs sentence can be logged for
+	 *            debugging purposes)
 	 */
 	public void log(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
 		switch (workingMode) {
@@ -264,8 +262,7 @@ public class IgcLogger {
 	}
 
 	/**
-	 * can be used to stop the poller thread. only affects IgcLogger in ASYNC
-	 * mode
+	 * can be used to stop the poller thread. only affects IgcLogger in ASYNC mode
 	 */
 	public void stop() {
 		if (pollerFuture != null) {
@@ -275,53 +272,39 @@ public class IgcLogger {
 }
 
 /*
- * From IGC spec
- * (http://www.fai.org/gnss-recording-devices/igc-approved-flight-recorders):
+ * From IGC spec (http://www.fai.org/gnss-recording-devices/igc-approved-flight-recorders):
  * 
- * Altitude - Metres, separate records for GNSS and pressure altitudes. Date (of
- * the first line in the B record) - UTC DDMMYY (day, month, year). Latitude and
- * Longitude - Degrees, minutes and decimal minutes to three decimal places,
- * with N,S,E,W designators Time - UTC, for source, see para 3.4 in the main
- * body in this document. Note that UTC is not the same as the internal system
- * time in the U.S. GPS system, see under "GPS system time" in the Glossary.
+ * Altitude - Metres, separate records for GNSS and pressure altitudes. Date (of the first line in the B record) - UTC
+ * DDMMYY (day, month, year). Latitude and Longitude - Degrees, minutes and decimal minutes to three decimal places,
+ * with N,S,E,W designators Time - UTC, for source, see para 3.4 in the main body in this document. Note that UTC is not
+ * the same as the internal system time in the U.S. GPS system, see under "GPS system time" in the Glossary.
  * 
  * ---
  * 
- * Altitude - AAAAAaaa AAAAA - fixed to 5 digits with leading 0 aaa - where
- * used, the number of altitude decimals (the number of fields recorded are
- * those available for altitude in the Record concerned, less fields already
- * used for AAAAA) Altitude, GNSS. Where GNSS altitude is not available from
- * GNSS position-lines such as in the case of a 2D fix (altitude drop-out), it
- * shall be recorded in the IGC format file as zero so that the lack of valid
- * GNSS altitude can be clearly seen during post-flight analysis.
+ * Altitude - AAAAAaaa AAAAA - fixed to 5 digits with leading 0 aaa - where used, the number of altitude decimals (the
+ * number of fields recorded are those available for altitude in the Record concerned, less fields already used for
+ * AAAAA) Altitude, GNSS. Where GNSS altitude is not available from GNSS position-lines such as in the case of a 2D fix
+ * (altitude drop-out), it shall be recorded in the IGC format file as zero so that the lack of valid GNSS altitude can
+ * be clearly seen during post-flight analysis.
  * 
- * Date - DDMMYY DD - number of the day in the month, fixed to 2 digits with
- * leading 0 where necessary MM - number of the month in year, fixed to 2 digits
- * with leading 0 where necessary YY - number of the year, fixed to 2 digits
- * with leading 0 where necessary
+ * Date - DDMMYY DD - number of the day in the month, fixed to 2 digits with leading 0 where necessary MM - number of
+ * the month in year, fixed to 2 digits with leading 0 where necessary YY - number of the year, fixed to 2 digits with
+ * leading 0 where necessary
  * 
- * Lat/Long - D D M M m m m N D D D M M m m m E DD - Latitude degrees with
- * leading 0 where necessary DDD - Longitude degrees with leading 0 or 00 where
- * necessary MMmmmNSEW - Lat/Long minutes with leading 0 where necessary, 3
- * decimal places of minutes (mandatory, not optional), followed by North,
- * South, East or West letter as appropriate
+ * Lat/Long - D D M M m m m N D D D M M m m m E DD - Latitude degrees with leading 0 where necessary DDD - Longitude
+ * degrees with leading 0 or 00 where necessary MMmmmNSEW - Lat/Long minutes with leading 0 where necessary, 3 decimal
+ * places of minutes (mandatory, not optional), followed by North, South, East or West letter as appropriate
  * 
- * Time - HHMMSS (UTC) - for optional decimal seconds see "s" below HH - Hours
- * fixed to 2 digits with leading 0 where necessary MM - Minutes fixed to 2
- * digits with leading 0 where necessary SS - Seconds fixed to 2 digits with
- * leading 0 where necessary s - number of decimal seconds (if used), placed
- * after seconds (SS above). If the recorder uses fix intervals of less than one
- * second, the extra number(s) are added in the B-record line, their position on
- * the line being identified in the I-record under the Three Letter Code TDS
- * (Time Decimal Seconds, see the codes in para A7). One number "s" indicates
- * tenths of seconds and "ss" is tenths and hundredths, and so forth. If tenths
- * are used at, for instance, character number 49 in the B-record (after other
- * codes such as FXA, SIU, ENL), this is indicated in the I record as:
- * "4949TDS".
+ * Time - HHMMSS (UTC) - for optional decimal seconds see "s" below HH - Hours fixed to 2 digits with leading 0 where
+ * necessary MM - Minutes fixed to 2 digits with leading 0 where necessary SS - Seconds fixed to 2 digits with leading 0
+ * where necessary s - number of decimal seconds (if used), placed after seconds (SS above). If the recorder uses fix
+ * intervals of less than one second, the extra number(s) are added in the B-record line, their position on the line
+ * being identified in the I-record under the Three Letter Code TDS (Time Decimal Seconds, see the codes in para A7).
+ * One number "s" indicates tenths of seconds and "ss" is tenths and hundredths, and so forth. If tenths are used at,
+ * for instance, character number 49 in the B-record (after other codes such as FXA, SIU, ENL), this is indicated in the
+ * I record as: "4949TDS".
  * 
- * B HHMMSS DDMMmmmN DDDMMmmmE V PPPPP GGGGG CR LF B 130353 4344108N 00547165E A
- * 00275 00275 4533.12N 00559.93E
+ * B HHMMSS DDMMmmmN DDDMMmmmE V PPPPP GGGGG CR LF B 130353 4344108N 00547165E A 00275 00275 4533.12N 00559.93E
  * 
- * Condor example: HFDTE140713 HFGIDGLIDERID:F-SEB
- * B1303534344108N00547165EA0027500275
+ * Condor example: HFDTE140713 HFGIDGLIDERID:F-SEB B1303534344108N00547165EA0027500275
  */
