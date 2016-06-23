@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.ogn.commons.beacon.OgnBeacon;
@@ -127,7 +128,8 @@ public class AprsUtils {
 	 * @return
 	 */
 	public static long toUtcTimestamp(int h, int m, int s) {
-		return LocalDateTime.of(LocalDate.now(), LocalTime.of(h, m, s)).toEpochSecond(ZoneOffset.UTC) * 1000;
+		return ZonedDateTime.of(LocalDateTime.of(LocalDate.now(), LocalTime.of(h, m, s)), ZoneOffset.UTC)
+				.toEpochSecond() * 1000;
 	}
 
 	/**
