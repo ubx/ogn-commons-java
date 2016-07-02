@@ -88,5 +88,8 @@ public interface AircraftBeacon extends OgnBeacon {
 	 * @return estimated effective radiated power of the transmitter
 	 */
 	float getERP();
+	
+	
+	float getFlightLevel();
 
 }

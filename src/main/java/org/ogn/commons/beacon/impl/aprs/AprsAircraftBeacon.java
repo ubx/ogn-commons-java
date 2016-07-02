@@ -109,6 +109,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	 */
 	protected Set<String> heardAircraftIds = new HashSet<>();
 
+	/**
+	 * flight level as computed by the device (barometric)
+	 */
+	protected float flightLevel = Float.NaN;
+
 	// F-GEKY>APRS,qAS,CHALLES:/145914h4533.12N/00559.93E'140/045/A=003316|H&,+Ll#U"RLz|
 	// F-CLUI>APRS,qAS,TELECOM:/162648h4531.79N/00558.92E'036/056/A=003037
 	// id06DDA310 +495fpm -0.4rot 10.7dB 0e hear9B73
@@ -135,6 +140,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	private static final Pattern hwVersionPattern = Pattern.compile("h([0-9a-fA-F]{2})");
 	private static final Pattern originalAddressPattern = Pattern.compile("r(\\S{6})");
 	private static final Pattern erpPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)dBm");
+	private static final Pattern flPattern = Pattern.compile("FL(\\d+\\.\\d+)");
 
 	@Override
 	public String getReceiverName() {
@@ -219,6 +225,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	@Override
 	public float getERP() {
 		return erp;
+	}
+
+	@Override
+	public float getFlightLevel() {
+		return flightLevel;
 	}
 
 	@Override
@@ -313,6 +324,8 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				originalAddress = matcher.group(1);
 			} else if ((matcher = erpPattern.matcher(aprsParam)).matches()) {
 				erp = Float.parseFloat(matcher.group(2));
+			} else if ((matcher = flPattern.matcher(aprsParam)).matches()) {
+				flightLevel = Float.parseFloat(matcher.group(1));
 			} else {
 
 				unmachedParams.add(aprsParam);
@@ -405,5 +418,4 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 			return false;
 		return true;
 	}
-
 }

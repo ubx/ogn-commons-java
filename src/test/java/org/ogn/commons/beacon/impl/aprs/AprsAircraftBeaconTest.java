@@ -202,4 +202,15 @@ public class AprsAircraftBeaconTest {
 		assertEquals(b1, b2);
 	}
 
+	@Test
+	public void testFlghtLevelInBeacon() {
+		String acBeacon = "OGN37413F>APRS,qAS,LKMO:/092623h5031.47N/01340.79E'000/000/A=001105 !W39! id0737413F +040fpm +0.0rot FL009.12 31.8dB 0e -2.1kHz";
+
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+
+		assertNotNull(b1);
+
+		assertEquals(9.12f, b1.getFlightLevel(), 0.01f);
+	}
+
 }
