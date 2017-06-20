@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * The IGC logger creates and writes to IGC files. The logger's log() operation is non-blocking (logs are written to a
  * file by a background thread)
  * 
- * @author Seb, wbuczak
+ * @author wbuczak
  */
 public class IgcLogger {
 
@@ -51,9 +52,9 @@ public class IgcLogger {
 
 	private static class LogRecord {
 		AircraftBeacon beacon;
-		AircraftDescriptor descriptor;
+		Optional<AircraftDescriptor> descriptor;
 
-		LogRecord(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
+		LogRecord(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
 			this.beacon = beacon;
 			this.descriptor = descriptor;
 		}
@@ -111,7 +112,8 @@ public class IgcLogger {
 		this(logsFolder, Mode.ASYNC);
 	}
 
-	private void writeIgcHeader(FileWriter igcFile, ZonedDateTime utcDateTime, AircraftDescriptor descriptor) {
+	private void writeIgcHeader(FileWriter igcFile, ZonedDateTime utcDateTime,
+			Optional<AircraftDescriptor> descriptor) {
 
 		// Write IGC file header
 		StringBuilder bld = new StringBuilder();
@@ -126,10 +128,10 @@ public class IgcLogger {
 																						// the
 																						// year
 
-			if (descriptor != null && descriptor.isKnown())
-				bld.append(LINE_SEP).append("HFGIDGLIDERID:").append(descriptor.getRegNumber()).append(LINE_SEP)
-						.append("HFGTYGLIDERTYPE:").append(descriptor.getModel()).append(LINE_SEP)
-						.append("HFCIDCOMPETITIONID:").append(descriptor.getCN()).append(LINE_SEP);
+			if (descriptor != null && descriptor.isPresent())
+				bld.append(LINE_SEP).append("HFGIDGLIDERID:").append(descriptor.get().getRegNumber()).append(LINE_SEP)
+						.append("HFGTYGLIDERTYPE:").append(descriptor.get().getModel()).append(LINE_SEP)
+						.append("HFCIDCOMPETITIONID:").append(descriptor.get().getCN()).append(LINE_SEP);
 
 			igcFile.write(bld.toString());
 
@@ -138,15 +140,15 @@ public class IgcLogger {
 		}
 	}
 
-	private void logToIgcFile(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
+	private void logToIgcFile(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
 
 		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
 
 		ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
 
-		String dateString = new String(String.format("%04d", utcDateTime.getYear()) + "-"
-				+ String.format("%02d", utcDateTime.getMonth().getValue()) + "-"
-				+ String.format("%02d", utcDateTime.getDayOfMonth()));
+		StringBuilder dateString = new StringBuilder(String.format("%04d", utcDateTime.getYear())).append("-")
+				.append(String.format("%02d", utcDateTime.getMonth().getValue())).append("-")
+				.append(String.format("%02d", utcDateTime.getDayOfMonth()));
 
 		// Generate filename from date and immat
 		String igcFileName = new String(dateString + "_" + igcId + ".IGC");
@@ -246,7 +248,7 @@ public class IgcLogger {
 	 *            a string which will fall into the igc file as a comment (e.g. aprs sentence can be logged for
 	 *            debugging purposes)
 	 */
-	public void log(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
+	public void log(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
 		switch (workingMode) {
 
 		case ASYNC:

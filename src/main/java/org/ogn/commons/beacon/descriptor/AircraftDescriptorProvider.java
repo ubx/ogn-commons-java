@@ -4,6 +4,8 @@
 
 package org.ogn.commons.beacon.descriptor;
 
+import java.util.Optional;
+
 import org.ogn.commons.beacon.AircraftDescriptor;
 
 /**
@@ -20,5 +22,5 @@ public interface AircraftDescriptorProvider {
 	 *            hardware address (FLARM.ICAO,OGN..)
 	 * @return static aircraft's descriptor or null if unavailable
 	 */
-	AircraftDescriptor findDescriptor(String address);
+	Optional<AircraftDescriptor> findDescriptor(String address);
 }

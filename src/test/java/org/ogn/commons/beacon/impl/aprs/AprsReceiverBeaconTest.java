@@ -113,4 +113,17 @@ public class AprsReceiverBeaconTest {
 		assertNotNull(b1);
 	}
 
+	@Test
+	public void test_0_2_6_receiverBeacon() {
+		// receiver position beacon
+		String recBeacon = "SKRZYCZNE>APRS,TCPIP*,qAC,GLIDERN1:/170821h4941.08NI01901.86E&/A=001345";
+		ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
+
+		assertEquals(recBeacon, b1.getRawPacket());
+
+		// still, the object should be created (although its attributes will not
+		// be all initialized)
+		assertNotNull(b1);
+	}
+
 }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import org.junit.After;
@@ -89,7 +90,7 @@ public class IgcLoggerTest {
 		int i = 0;
 		for (String aprsLine : aprsPhrases) {
 			AircraftBeacon beacon = new AprsAircraftBeacon(aprsLine);
-			logger.log(beacon, descriptors[i++]);
+			logger.log(beacon, Optional.of(descriptors[i++]));
 		}
 
 		commonVerification();
@@ -102,11 +103,11 @@ public class IgcLoggerTest {
 		int i = 0;
 		for (String aprsLine : aprsPhrases) {
 			AircraftBeacon beacon = new AprsAircraftBeacon(aprsLine);
-			logger.log(beacon, descriptors[i++]);
+			logger.log(beacon, Optional.of(descriptors[i++]));
 		}
 
 		// wait a bit..
-		Thread.sleep(600);
+		Thread.sleep(1000);
 
 		commonVerification();
 	}

@@ -4,6 +4,7 @@
 
 package org.ogn.commons.utils;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.ogn.commons.beacon.AircraftBeacon;
@@ -18,15 +19,15 @@ public class IgcUtils {
 	 * @param descriptor
 	 * @return
 	 */
-	public static String toIgcLogFileId(final AircraftBeacon beacon, final AircraftDescriptor descriptor) {
+	public static String toIgcLogFileId(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
 		StringBuilder id = new StringBuilder(beacon.getId());
-		if (descriptor.isKnown()) {
+		if (descriptor.isPresent()) {
 
 			// \/:*?"<>|
 			final Pattern p = Pattern.compile("[^\\/:*?\"<>|]*$");
 
-			String reg = descriptor.getRegNumber();
-			String cn = descriptor.getCN();
+			String reg = descriptor.get().getRegNumber();
+			String cn = descriptor.get().getCN();
 
 			reg = reg == null || (!p.matcher(reg).matches()) ? null : reg.toUpperCase();
 			cn = cn == null || (!p.matcher(cn).matches()) ? null : cn.toUpperCase();

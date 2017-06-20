@@ -26,7 +26,7 @@ public class SendMail {
 		this.snmpHost = snmpHost;
 		this.snmpPort = snmpPort;
 		this.snmpUser = snmpUser;
-		this.snmpPass = snmpPass;
+		this.snmpPass = snmpPass;		
 	}
 
 	public SendMail(String snmpHost, String snmpUser, String snmpPass) {

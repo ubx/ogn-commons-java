@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -19,11 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is a base class for loading data from "file" databases, such as FlarmNet
- * db or OGN db. Data can be loaded from remote server (e.g. directly from
- * flarmnet or ogn web server) or from a local db file and is kept in the
- * internal cache. When refresh() is called the cache is updated. This class is
- * thread-safe!
+ * This is a base class for loading data from "file" databases, such as FlarmNet db or OGN db. Data can be loaded from
+ * remote server (e.g. directly from flarmnet or ogn web server) or from a local db file and is kept in the internal
+ * cache. When refresh() is called the cache is updated. This class is thread-safe!
  * 
  * @author Seb, wbuczak
  */
@@ -102,7 +101,7 @@ public abstract class FileDb {
 					LOG.error("Exception caught", e);
 				}
 
-			}// while
+			} // while
 
 		} catch (Exception e) {
 			LOG.error("Exception caught", e);
@@ -117,9 +116,9 @@ public abstract class FileDb {
 		}
 	}
 
-	public AircraftDescriptor getDescriptor(String id) {
-		if (id == null)
-			return null;
-		return cache.get(id);
+	public Optional<AircraftDescriptor> getDescriptor(String id) {
+		if (null == id || null == cache.get(id))
+			return Optional.empty();
+		return Optional.of(cache.get(id));
 	}
 }

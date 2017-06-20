@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.OgnBeacon;
@@ -21,6 +22,7 @@ public class AprsLineParserTest {
 	@Test
 	public void test() {
 
+		// "SKRZYCZNE>APRS,TCPIP*,qAC,GLIDERN1:/165321h4941.08NI01901.86E&/A=001345";
 		String acBeacon1 = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
 		String brBeacon1 = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
 
@@ -87,6 +89,26 @@ public class AprsLineParserTest {
 
 		System.out.println(JsonUtils.toJson(beacon));
 
+	}
+
+	// TODO: fix !
+	@Test
+	@Ignore
+	public void test_0_2_6_RecBeaconFormat() {
+		String rawRecPosBeacon = "SKRZYCZNE>APRS,TCPIP*,qAC,GLIDERN1:/165321h4941.08NI01901.86E&/A=001345";
+		AprsLineParser parser = AprsLineParser.get();
+		OgnBeacon beacon1 = parser.parse(rawRecPosBeacon);
+		assertNotNull(beacon1);
+		assertTrue(beacon1 instanceof ReceiverBeacon);
+		System.out.println(JsonUtils.toJson(beacon1));
+
+		String rawRecMetricsBeacon = "SKRZYCZNE>APRS,TCPIP*,qAC,GLIDERN1:>165321h v0.2.6.RPI-GPU CPU:0.4 RAM:693.9/970.5MB "
+				+ "NTP:0.6ms/+0.4ppm +52.6C 2/2Acfts[1h] RF:+48+0.6ppm/+4.23dB/+12.7dB@10km[28932]/+22.2dB@10km[7/14]";
+
+		OgnBeacon beacon2 = parser.parse(rawRecMetricsBeacon);
+		assertNotNull(beacon2);
+		assertTrue(beacon2 instanceof ReceiverBeacon);
+		System.out.println(JsonUtils.toJson(beacon2));
 	}
 
 }

@@ -8,11 +8,7 @@ import java.io.Serializable;
 
 import org.ogn.commons.beacon.AircraftDescriptor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable {
-
-	public static AircraftDescriptor UNKNOWN_AIRCRAFT_DESCRIPTOR = new AircraftDescriptorImpl();
 
 	private static final long serialVersionUID = -5907836745963656899L;
 
@@ -83,14 +79,6 @@ public class AircraftDescriptorImpl implements AircraftDescriptor, Serializable 
 	@Override
 	public String getFreq() {
 		return freq;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isKnown() {
-		// to be considered as "known" a descriptor must have at least
-		// registration number
-		return regNumber != null;
 	}
 
 	@Override

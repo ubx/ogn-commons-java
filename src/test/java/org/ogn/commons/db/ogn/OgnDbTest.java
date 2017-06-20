@@ -5,10 +5,13 @@
 package org.ogn.commons.db.ogn;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.Test;
@@ -23,17 +26,17 @@ public class OgnDbTest {
 		final OgnDb ogndb = new OgnDb("src/test/resources/ogn-ddb.txt");
 		ogndb.reload();
 
-		AircraftDescriptor desc = ogndb.getDescriptor(null);
-		assertNull(desc);
+		assertFalse(ogndb.getDescriptor(null).isPresent());
 
-		desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
+		Optional<AircraftDescriptor> desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
 		assertNotNull(desc);
-
-		System.out.println(JsonUtils.toJson(desc));
+		assertTrue(desc.isPresent());
+		System.out.println(JsonUtils.toJson(desc.get()));
 
 		desc = ogndb.getDescriptor("DDDC04"); // FLARM address
-		System.out.println(JsonUtils.toJson(desc));
 		assertNotNull(desc);
+		assertTrue(desc.isPresent());
+		System.out.println(JsonUtils.toJson(desc.get()));
 
 		final Runnable reloader = new Runnable() {
 
@@ -59,33 +62,40 @@ public class OgnDbTest {
 		for (int i = 0; i < 5; i++) {
 
 			desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc.get()));
 
 			desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
+
 			desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
 			Thread.sleep(20 + r.nextInt(50));
 
 			desc = ogndb.getDescriptor("some-not-existing");
-			assertNull(desc);
+			assertNotNull(desc);
+			assertFalse(desc.isPresent());
 
 			Thread.sleep(20 + r.nextInt(50));
 			desc = ogndb.getDescriptor("DD4E9C"); // FLARM address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
 
-			assertEquals("G-DGIO", desc.getRegNumber());
-			assertEquals("DG1", desc.getCN());
-			assertNull(desc.getOwner());
-			assertEquals("DG-100", desc.getModel());
-			assertNull(desc.getFreq());
+			assertEquals("G-DGIO", desc.get().getRegNumber());
+			assertEquals("DG1", desc.get().getCN());
+			assertNull(desc.get().getOwner());
+			assertEquals("DG-100", desc.get().getModel());
+			assertNull(desc.get().getFreq());
 
 			desc = ogndb.getDescriptor("some-not-existing");
-			assertNull(desc);
+			assertNotNull(desc);
+			assertFalse(desc.isPresent());
 
 			Thread.sleep(100 + r.nextInt(100));
 		}
@@ -103,8 +113,9 @@ public class OgnDbTest {
 			fail("Exception not expected");
 		}
 
-		AircraftDescriptor desc = ogndb.getDescriptor("DD83CE");
-		assertNull(desc);
+		Optional<AircraftDescriptor> desc = ogndb.getDescriptor("DD83CE");
+		assertNotNull(desc);
+		assertFalse(desc.isPresent());
 	}
 
 	@Test
@@ -116,7 +127,8 @@ public class OgnDbTest {
 			fail("Exception not expected");
 		}
 
-		AircraftDescriptor desc = ogndb.getDescriptor("DD83CE");
-		assertNull(desc);
+		Optional<AircraftDescriptor> desc = ogndb.getDescriptor("DD83CE");
+		assertNotNull(desc);
+		assertFalse(desc.isPresent());
 	}
 }

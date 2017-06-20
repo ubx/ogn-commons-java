@@ -5,6 +5,7 @@
 package org.ogn.commons.db;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,10 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A FileDbDescriptorProvider is a type of
- * <code>AircraftDescriptorProvider</code> which resolves AircraftDescriptors
- * from file-based databases (e.g. OGN ddb). It can be configured to refresh its
- * internal cache periodically.
+ * A FileDbDescriptorProvider is a type of <code>AircraftDescriptorProvider</code> which resolves AircraftDescriptors
+ * from file-based databases (e.g. OGN ddb). It can be configured to refresh its internal cache periodically.
  * 
  * @author wbuczak
  */
@@ -45,6 +44,9 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
 			return;
 		}
 
+		// load the first time
+		db.reload();
+
 		scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
 		scheduledExecutor.scheduleAtFixedRate(new Runnable() {
@@ -56,7 +58,7 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
 				db.reload();
 
 			}
-		}, 0, dbRefreshInterval, TimeUnit.SECONDS);
+		}, dbRefreshInterval, dbRefreshInterval, TimeUnit.SECONDS);
 
 	}
 
@@ -69,7 +71,7 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
 	}
 
 	@Override
-	public AircraftDescriptor findDescriptor(String address) {
+	public Optional<AircraftDescriptor> findDescriptor(String address) {
 		LOG.trace("entering findDescriptor()..");
 		return db.getDescriptor(address);
 	}

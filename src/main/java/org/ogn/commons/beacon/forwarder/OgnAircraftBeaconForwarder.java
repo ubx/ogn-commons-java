@@ -4,6 +4,8 @@
 
 package org.ogn.commons.beacon.forwarder;
 
+import java.util.Optional;
+
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 
@@ -21,5 +23,5 @@ public interface OgnAircraftBeaconForwarder extends OgnBeaconForwarder {
 	 * @param descriptor
 	 *            static aircraft description
 	 */
-	void onBeacon(AircraftBeacon beacon, AircraftDescriptor descriptor);
+	void onBeacon(AircraftBeacon beacon, Optional<AircraftDescriptor> descriptor);
 }

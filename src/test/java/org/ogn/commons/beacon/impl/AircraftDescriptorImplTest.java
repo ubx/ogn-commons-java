@@ -21,8 +21,6 @@ public class AircraftDescriptorImplTest {
 				"129.975", true, true);
 		assertNotNull(d1);
 
-		assertTrue(d1.isKnown());
-
 		assertEquals("G-EEBM", d1.getRegNumber());
 		assertEquals("EBM", d1.getCN());
 		assertEquals("YGC", d1.getOwner());

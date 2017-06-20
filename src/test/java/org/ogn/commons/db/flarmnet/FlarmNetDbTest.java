@@ -5,10 +5,12 @@
 package org.ogn.commons.db.flarmnet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.Ignore;
@@ -27,17 +29,18 @@ public class FlarmNetDbTest {
 		final FlarmNetDb fnet = new FlarmNetDb();
 		fnet.reload();
 
-		AircraftDescriptor desc = fnet.getDescriptor(null);
-		assertNull(desc);
+		Optional<AircraftDescriptor> desc = fnet.getDescriptor(null);
+		assertFalse(desc.isPresent());
 
 		desc = fnet.getDescriptor("DF08E8"); // FLARM address
 		assertNotNull(desc);
-
-		System.out.println(JsonUtils.toJson(desc));
+		assertTrue(desc.isPresent());
+		System.out.println(JsonUtils.toJson(desc.get()));
 
 		desc = fnet.getDescriptor("DDD587"); // FLARM address
-		System.out.println(JsonUtils.toJson(desc));
 		assertNotNull(desc);
+		assertTrue(desc.isPresent());
+		System.out.println(JsonUtils.toJson(desc.get()));
 
 		final Runnable reloader = new Runnable() {
 
@@ -63,30 +66,36 @@ public class FlarmNetDbTest {
 		for (int i = 0; i < 5; i++) {
 
 			desc = fnet.getDescriptor("406042"); // ICAO address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
 
 			desc = fnet.getDescriptor("406042"); // ICAO address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
+
 			desc = fnet.getDescriptor("406042"); // ICAO address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
 			Thread.sleep(20 + r.nextInt(50));
 
 			desc = fnet.getDescriptor("some-not-existing");
-			assertNull(desc);
+			assertNotNull(desc);
+			assertFalse(desc.isPresent());
 
 			Thread.sleep(20 + r.nextInt(50));
 			desc = fnet.getDescriptor("406042"); // ICAO address
-			System.out.println(JsonUtils.toJson(desc));
 			assertNotNull(desc);
+			assertTrue(desc.isPresent());
+			System.out.println(JsonUtils.toJson(desc));
 
-			assertEquals("G-DEED", desc.getRegNumber());
-			assertEquals("EED", desc.getCN());
-			assertEquals("Bicester Gliding", desc.getOwner());
-			assertEquals("Ka-8", desc.getModel());
-			assertEquals("129.975", desc.getFreq());
+			assertEquals("G-DEED", desc.get().getRegNumber());
+			assertEquals("EED", desc.get().getCN());
+			assertEquals("Bicester Gliding", desc.get().getOwner());
+			assertEquals("Ka-8", desc.get().getModel());
+			assertEquals("129.975", desc.get().getFreq());
 
 			desc = fnet.getDescriptor("some-not-existing");
 			assertNull(desc);
@@ -103,11 +112,12 @@ public class FlarmNetDbTest {
 		FlarmNetDb fnet = new FlarmNetDb("src/test/resources/data.fln");
 		long t1 = System.currentTimeMillis();
 		fnet.reload();
-		AircraftDescriptor desc = fnet.getDescriptor("F72345"); // FLARM address
+		Optional<AircraftDescriptor> desc = fnet.getDescriptor("F72345"); // FLARM address
 		assertNotNull(desc);
+		assertTrue(desc.isPresent());
 		System.out.println(JsonUtils.toJson(desc));
-		assertTrue(desc.isKnown());
-		assertEquals("PH-1341", desc.getRegNumber());
+
+		assertEquals("PH-1341", desc.get().getRegNumber());
 		long t2 = System.currentTimeMillis();
 		long dt = t2 - t1;
 
@@ -116,9 +126,10 @@ public class FlarmNetDbTest {
 		desc = fnet.getDescriptor("F72345");
 		desc = fnet.getDescriptor("F72345");
 		assertNotNull(desc);
+		assertTrue(desc.isPresent());
 		System.out.println(JsonUtils.toJson(desc));
-		assertTrue(desc.isKnown());
-		assertEquals("PH-1341", desc.getRegNumber());
+
+		assertEquals("PH-1341", desc.get().getRegNumber());
 		long t3 = System.currentTimeMillis();
 		long dt2 = t3 - t2;
 		assertTrue(dt2 < dt);
@@ -128,18 +139,20 @@ public class FlarmNetDbTest {
 	public void testWithLocalDb() throws Exception {
 		FlarmNetDb fnet = new FlarmNetDb("src/test/resources/data.fln");
 		fnet.reload();
-		AircraftDescriptor desc = fnet.getDescriptor("DF08E8"); // FLARM address
+		Optional<AircraftDescriptor> desc = fnet.getDescriptor("DF08E8"); // FLARM address
 		assertNotNull(desc);
-
+		assertTrue(desc.isPresent());
 		System.out.println(JsonUtils.toJson(desc));
 
 		desc = fnet.getDescriptor("DDD587"); // FLARM address
-		System.out.println(JsonUtils.toJson(desc));
 		assertNotNull(desc);
+		assertTrue(desc.isPresent());
+		System.out.println(JsonUtils.toJson(desc));
 
 		fnet = new FlarmNetDb("file:///src/test/resources/data.fln");
 		fnet.reload();
 		desc = fnet.getDescriptor("DF08E8"); // FLARM address
 		assertNotNull(desc);
+		assertTrue(desc.isPresent());
 	}
 }
