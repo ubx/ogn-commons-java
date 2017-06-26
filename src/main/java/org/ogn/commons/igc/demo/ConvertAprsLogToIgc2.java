@@ -1,5 +1,7 @@
 package org.ogn.commons.igc.demo;
 
+import java.time.LocalDate;
+
 import org.ogn.commons.beacon.descriptor.AircraftDescriptorProvider;
 import org.ogn.commons.db.FileDbDescriptorProvider;
 import org.ogn.commons.db.ogn.OgnDb;
@@ -18,8 +20,9 @@ public class ConvertAprsLogToIgc2 {
 
 		String aprsLogfileName = ConvertAprsLogToIgc.getAprsLogFileName(args);
 		IgcLogger igcLogger = ConvertAprsLogToIgc.createIgcLogger(args);
-
-		ConvertAprsLogToIgc.processAprsLogFile(aprsLogfileName, igcLogger, provider);
+		LocalDate dateOfFlight = ConvertAprsLogToIgc.getDateOfFlight(args);
+		
+		ConvertAprsLogToIgc.processAprsLogFile(aprsLogfileName, dateOfFlight, igcLogger, provider);
 
 		System.exit(0);
 	}

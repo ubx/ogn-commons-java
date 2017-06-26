@@ -132,6 +132,10 @@ public class AprsUtils {
 				.toEpochSecond() * 1000;
 	}
 
+	public static long toUtcTimestamp(LocalDate date, int h, int m, int s) {
+		return ZonedDateTime.of(LocalDateTime.of(date, LocalTime.of(h, m, s)), ZoneOffset.UTC).toEpochSecond() * 1000;
+	}
+
 	/**
 	 * @param time
 	 *            time in 6 digit format provided in a APRS packet (e.g. 162334, 051202)
@@ -143,6 +147,14 @@ public class AprsUtils {
 		int s = Integer.parseInt(time.substring(4, 6));
 
 		return toUtcTimestamp(h, m, s);
+	}
+
+	public static long toUtcTimestamp(LocalDate date, String time) {
+		int h = Integer.parseInt(time.substring(0, 2));
+		int m = Integer.parseInt(time.substring(2, 4));
+		int s = Integer.parseInt(time.substring(4, 6));
+
+		return toUtcTimestamp(date, h, m, s);
 	}
 
 	public static float feetsToMetres(float feets) {

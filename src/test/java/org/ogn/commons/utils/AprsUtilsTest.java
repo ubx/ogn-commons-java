@@ -9,6 +9,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -108,6 +110,12 @@ public class AprsUtilsTest {
 
 		t = AprsUtils.toUtcTimestamp("235959");
 		assertEquals(0, t - timestamp);
+		assertTrue(t % 1000 == 0);
+
+		LocalDate date = LocalDate.of(2016, 10, 5);
+		LocalTime time = LocalTime.of(11, 12, 33);
+		t = AprsUtils.toUtcTimestamp(date, time.getHour(), time.getMinute(), time.getSecond());
+		// the timestamp should be rounded to a sec
 		assertTrue(t % 1000 == 0);
 	}
 

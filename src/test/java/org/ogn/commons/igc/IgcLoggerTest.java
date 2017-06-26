@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -64,7 +65,9 @@ public class IgcLoggerTest {
 		files.clear();
 
 		// delete log folder if it exists
-		Path dir = Paths.get("log/" + date);
+		// Path dir = Paths.get("log/" + date);
+
+		Path dir = Paths.get("log/");
 		if (Files.exists(dir)) {
 			Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
 				@Override
@@ -93,7 +96,22 @@ public class IgcLoggerTest {
 			logger.log(beacon, Optional.of(descriptors[i++]));
 		}
 
-		commonVerification();
+		commonVerification(date);
+	}
+
+	@Test
+	public void testSyncWithPredefinedDate() throws Exception {
+		IgcLogger logger = new IgcLogger(IgcLogger.Mode.SYNC);
+
+		LocalDate date = LocalDate.of(2016, 06, 14);
+
+		int i = 0;
+		for (String aprsLine : aprsPhrases) {
+			AircraftBeacon beacon = new AprsAircraftBeacon(aprsLine);
+			logger.log(beacon, Optional.of(date), Optional.of(descriptors[i++]));
+		}
+
+		commonVerification(date.toString());
 	}
 
 	@Test
@@ -109,10 +127,10 @@ public class IgcLoggerTest {
 		// wait a bit..
 		Thread.sleep(1000);
 
-		commonVerification();
+		commonVerification(date);
 	}
 
-	private void commonVerification() throws Exception {
+	private void commonVerification(String date) throws Exception {
 		// make sure files were created
 		// delete log folder if it exists
 		Path dir = Paths.get("log/" + date);

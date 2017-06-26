@@ -7,6 +7,9 @@ package org.ogn.commons.igc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -53,10 +56,13 @@ public class IgcLogger {
 	private static class LogRecord {
 		AircraftBeacon beacon;
 		Optional<AircraftDescriptor> descriptor;
+		Optional<LocalDate> date;
 
-		LogRecord(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
+		public LogRecord(AircraftBeacon beacon, Optional<LocalDate> date, Optional<AircraftDescriptor> descriptor) {
 			this.beacon = beacon;
 			this.descriptor = descriptor;
+			this.date = date;
+
 		}
 	}
 
@@ -74,7 +80,7 @@ public class IgcLogger {
 			while (!Thread.interrupted()) {
 				try {
 					record = logRecords.take();
-					logToIgcFile(record.beacon, record.descriptor);
+					logToIgcFile(record.beacon, record.date, record.descriptor);
 				} catch (InterruptedException e) {
 					PLOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
 					Thread.currentThread().interrupt();
@@ -112,16 +118,15 @@ public class IgcLogger {
 		this(logsFolder, Mode.ASYNC);
 	}
 
-	private void writeIgcHeader(FileWriter igcFile, ZonedDateTime utcDateTime,
-			Optional<AircraftDescriptor> descriptor) {
+	private void writeIgcHeader(FileWriter igcFile, ZonedDateTime datetime, Optional<AircraftDescriptor> descriptor) {
 
 		// Write IGC file header
 		StringBuilder bld = new StringBuilder();
 		try {
 			bld.append("AGNE001 OGN gateway").append(LINE_SEP);
-			bld.append("HFDTE").append(String.format("%02d", utcDateTime.getDayOfMonth()))
-					.append(String.format("%02d", utcDateTime.getMonthValue()))
-					.append(String.format("%04d", utcDateTime.getYear()).substring(2)); // last
+			bld.append("HFDTE").append(String.format("%02d", datetime.getDayOfMonth()))
+					.append(String.format("%02d", datetime.getMonthValue()))
+					.append(String.format("%04d", datetime.getYear()).substring(2)); // last
 																						// 2
 																						// chars
 																						// of
@@ -140,15 +145,24 @@ public class IgcLogger {
 		}
 	}
 
-	private void logToIgcFile(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
+	private void logToIgcFile(final AircraftBeacon beacon, final Optional<LocalDate> date,
+			final Optional<AircraftDescriptor> descriptor) {
 
 		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
 
-		ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
+		LocalDate d = date.isPresent() ? date.get() : LocalDate.now();
 
-		StringBuilder dateString = new StringBuilder(String.format("%04d", utcDateTime.getYear())).append("-")
-				.append(String.format("%02d", utcDateTime.getMonth().getValue())).append("-")
-				.append(String.format("%02d", utcDateTime.getDayOfMonth()));
+		ZonedDateTime beaconTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(beacon.getTimestamp()),
+				ZoneOffset.UTC);
+
+		// take the time part from the beacon
+		ZonedDateTime timestamp = ZonedDateTime.of(d,
+				LocalTime.of(beaconTimestamp.getHour(), beaconTimestamp.getMinute(), beaconTimestamp.getSecond()),
+				ZoneOffset.UTC);
+
+		StringBuilder dateString = new StringBuilder(String.format("%04d", timestamp.getYear())).append("-")
+				.append(String.format("%02d", timestamp.getMonth().getValue())).append("-")
+				.append(String.format("%02d", timestamp.getDayOfMonth()));
 
 		// Generate filename from date and immat
 		String igcFileName = new String(dateString + "_" + igcId + ".IGC");
@@ -193,7 +207,7 @@ public class IgcLogger {
 		// if this is a brand new file - write the header
 		if (writeHeader) {
 			// write the igc header
-			writeIgcHeader(igcFile, utcDateTime, descriptor);
+			writeIgcHeader(igcFile, timestamp, descriptor);
 		}
 
 		// Add fix
@@ -204,21 +218,21 @@ public class IgcLogger {
 			// log original APRS sentence to IGC file for debug, SAR & co
 			bld.append("LGNE ").append(beacon.getRawPacket()).append(LINE_SEP);
 
-			bld.append("B").append(String.format("%02d", utcDateTime.getHour()))
-					.append(String.format("%02d", utcDateTime.getMinute()))
-					.append(String.format("%02d", utcDateTime.getSecond()))
+			bld.append("B").append(String.format("%02d", timestamp.getHour()))
+					.append(String.format("%02d", timestamp.getMinute()))
+					.append(String.format("%02d", timestamp.getSecond()))
 					.append(AprsUtils.degToIgc(beacon.getLat(), Coordinate.LAT))
 					.append(AprsUtils.degToIgc(beacon.getLon(), Coordinate.LON)).append("A") // A
-																								// for
-																								// 3D
-																								// fix
-																								// (and
-																								// not
-																								// 2D)
+					// for
+					// 3D
+					// fix
+					// (and
+					// not
+					// 2D)
 					.append("00000") // baro. altitude (but it is false as we
-										// have only GPS altitude
+					// have only GPS altitude
 					.append(String.format("%05.0f", beacon.getAlt())) // GPS
-																		// altitude
+					// altitude
 
 					.append(LINE_SEP);
 
@@ -248,19 +262,24 @@ public class IgcLogger {
 	 *            a string which will fall into the igc file as a comment (e.g. aprs sentence can be logged for
 	 *            debugging purposes)
 	 */
-	public void log(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
+	public void log(final AircraftBeacon beacon, final Optional<LocalDate> date,
+			final Optional<AircraftDescriptor> descriptor) {
 		switch (workingMode) {
 
 		case ASYNC:
-			if (!logRecords.offer(new LogRecord(beacon, descriptor))) {
+			if (!logRecords.offer(new LogRecord(beacon, date, descriptor))) {
 				LOG.warn("could not insert LogRecord to the igc logging queue");
 			}
 			break;
 
 		default:
-			logToIgcFile(beacon, descriptor);
+			logToIgcFile(beacon, date, descriptor);
 		}
 
+	}
+
+	public void log(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
+		log(beacon, Optional.empty(), descriptor);
 	}
 
 	/**
