@@ -101,14 +101,14 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 	private static final Pattern versionPattern = Pattern.compile("v(\\d+\\.\\d+\\.\\d+)\\.?(.*?)");
 
 	private static final Pattern cpuPattern = Pattern.compile("CPU:(\\d+\\.\\d+)");
-	private static final Pattern cpuTempPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)C");
+	private static final Pattern cpuTempPattern = Pattern.compile("([+-]\\d+\\.\\d+)C");
 	private static final Pattern ramPattern = Pattern.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
 	private static final Pattern ntpPattern = Pattern.compile("NTP:(\\d+\\.\\d+)ms/(\\+|\\-)(\\d+\\.\\d+)ppm");
 
 	private static final Pattern rfPatternFull = Pattern
 			.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB");
 
-	private static final Pattern rfPatternLight1 = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
+	private static final Pattern rfPatternLight1 = Pattern.compile("RF:([+-]\\d+\\.\\d+)dB");
 
 	private static final Pattern rfPatternLight2 = Pattern.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm");
 
@@ -229,7 +229,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 			} else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
 				cpuLoad = Float.parseFloat(matcher.group(1));
 			} else if ((matcher = cpuTempPattern.matcher(aprsParam)).matches()) {
-				cpuTemp = Float.parseFloat(matcher.group(2));
+				cpuTemp = Float.parseFloat(matcher.group(1));
 				if (matcher.group(1).equals("-"))
 					cpuTemp *= -1;
 			} else if ((matcher = ramPattern.matcher(aprsParam)).matches()) {
@@ -251,7 +251,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 				if (matcher.group(5).equals("-"))
 					recInputNoise *= -1;
 			} else if ((matcher = rfPatternLight1.matcher(aprsParam)).matches()) {
-				recInputNoise = Float.parseFloat(matcher.group(2));
+				recInputNoise = Float.parseFloat(matcher.group(1));
 				if (matcher.group(1).equals("-"))
 					recInputNoise *= -1;
 			} else if ((matcher = rfPatternLight2.matcher(aprsParam)).matches()) {

@@ -124,22 +124,24 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	// -14.3kHz gps1x2 s6.05 h43 rDF0CD1 +4.5dBm";
 
 	private static final Pattern basicAprsPattern = Pattern.compile(
-			"(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
+			"(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(-?\\d+).*?");
 
 	private static final Pattern addressPattern = Pattern.compile("id(\\S{8})");
-	private static final Pattern climbRatePattern = Pattern.compile("(\\+|\\-)(\\d+)fpm");
-	private static final Pattern turnRatePattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)rot");
+	private static final Pattern climbRatePattern = Pattern.compile("([+-]\\d+)fpm");
+
+	private static final Pattern turnRatePattern = Pattern.compile("([+-]\\d+\\.\\d+)rot");
+
 	private static final Pattern signalStrengthPattern = Pattern.compile("(\\d+\\.\\d+)dB");
 	private static final Pattern errorCountPattern = Pattern.compile("(\\d+)e");
 	private static final Pattern coordinatesExtensionPattern = Pattern.compile("\\!W(.)(.)!");
 
 	private static final Pattern hearIDPattern = Pattern.compile("hear(\\w{4})");
-	private static final Pattern frequencyOffsetPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)kHz");
+	private static final Pattern frequencyOffsetPattern = Pattern.compile("([+-]\\d+\\.\\d+)kHz");
 	private static final Pattern gpsStatusPattern = Pattern.compile("gps(\\d+x\\d+)");
 	private static final Pattern firmwareVersionPattern = Pattern.compile("s(\\d+\\.\\d+)");
 	private static final Pattern hwVersionPattern = Pattern.compile("h([0-9a-fA-F]{2})");
 	private static final Pattern originalAddressPattern = Pattern.compile("r(\\S{6})");
-	private static final Pattern erpPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)dBm");
+	private static final Pattern erpPattern = Pattern.compile("([+-]\\d+\\.\\d+)dBm");
 	private static final Pattern flPattern = Pattern.compile("FL(\\d+\\.\\d+)");
 
 	@Override
@@ -294,14 +296,14 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 						.forValue((Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b1111100) >>> 2);
 				stealth = (Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b10000000) != 0;
 			} else if ((matcher = climbRatePattern.matcher(aprsParam)).matches()) {
-				climbRate = feetsToMetres(Float.parseFloat(matcher.group(2))) / 60; // feets/m
+				climbRate = feetsToMetres(Float.parseFloat(matcher.group(1))) / 60; // feets/m
 																					// to
 																					// m/s
 				if (matcher.group(1).equals("-"))
 					climbRate *= -1;
 				climbRate = (float) (Math.round(climbRate * 100) / 100.0);
 			} else if ((matcher = turnRatePattern.matcher(aprsParam)).matches()) {
-				turnRate = Float.parseFloat(matcher.group(2));
+				turnRate = Float.parseFloat(matcher.group(1));
 				if (matcher.group(1).equals("-"))
 					turnRate *= -1;
 			} else if ((matcher = signalStrengthPattern.matcher(aprsParam)).matches()) {
@@ -311,7 +313,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 			} else if ((matcher = hearIDPattern.matcher(aprsParam)).matches()) {
 				heardAircraftIds.add(matcher.group(1));
 			} else if ((matcher = frequencyOffsetPattern.matcher(aprsParam)).matches()) {
-				frequencyOffset = Float.parseFloat(matcher.group(2));
+				frequencyOffset = Float.parseFloat(matcher.group(1));
 				if (matcher.group(1).equals("-"))
 					frequencyOffset *= -1;
 			} else if ((matcher = gpsStatusPattern.matcher(aprsParam)).matches()) {
@@ -323,7 +325,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 			} else if ((matcher = originalAddressPattern.matcher(aprsParam)).matches()) {
 				originalAddress = matcher.group(1);
 			} else if ((matcher = erpPattern.matcher(aprsParam)).matches()) {
-				erp = Float.parseFloat(matcher.group(2));
+				erp = Float.parseFloat(matcher.group(1));
 			} else if ((matcher = flPattern.matcher(aprsParam)).matches()) {
 				flightLevel = Float.parseFloat(matcher.group(1));
 			} else {
