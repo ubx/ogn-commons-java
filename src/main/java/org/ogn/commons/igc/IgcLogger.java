@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +53,8 @@ public class IgcLogger {
 	private BlockingQueue<LogRecord> logRecords;
 	private volatile Future<?> pollerFuture;
 	private ExecutorService executor;
+
+	private Map<String, String> id2reg = null;
 
 	private static class LogRecord {
 		AircraftBeacon beacon;
@@ -165,7 +168,13 @@ public class IgcLogger {
 				.append(String.format("%02d", timestamp.getDayOfMonth()));
 
 		// Generate filename from date and immat
-		String igcFileName = new String(dateString + "_" + igcId + ".IGC");
+		String regName = id2reg.get(igcId.substring(3));
+		String igcFileName;
+		if (regName == null) {
+			igcFileName = new String(igcId + ".IGC");
+		} else {
+			igcFileName = new String(igcId + "_" + regName + ".IGC");
+		}
 
 		File theDir = new File(igcBaseDir);
 		if (!theDir.exists()) {
@@ -290,6 +299,11 @@ public class IgcLogger {
 			pollerFuture.cancel(false);
 		}
 	}
+
+	public void setId2reg(Map<String, String> id2reg) {
+		this.id2reg = id2reg;
+	}
+
 }
 
 /*
