@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
  */
 public class IgcLogger {
 
+	private static final String IGC_FILEEXTENSION = ".igc";
+
 	public static enum Mode {
 		ASYNC, SYNC
 	}
@@ -171,9 +173,9 @@ public class IgcLogger {
 		String regName = id2reg.get(igcId.substring(3));
 		String igcFileName;
 		if (regName == null) {
-			igcFileName = new String(igcId + ".IGC");
+			igcFileName = new String(igcId + IGC_FILEEXTENSION);
 		} else {
-			igcFileName = new String(igcId + "_" + regName + ".IGC");
+			igcFileName = new String(igcId + "_" + regName + IGC_FILEEXTENSION);
 		}
 
 		File theDir = new File(igcBaseDir);
