@@ -170,7 +170,7 @@ public class IgcLogger {
 				.append(String.format("%02d", timestamp.getDayOfMonth()));
 
 		// Generate filename from date and immat
-		String regName = id2reg.get(igcId.substring(3));
+		String regName = id2reg == null ? null : id2reg.get(igcId.substring(3));
 		String igcFileName;
 		if (regName == null) {
 			igcFileName = new String(igcId + IGC_FILEEXTENSION);
